@@ -14,7 +14,8 @@
     "@astrojs/node": "^10.1.4",
     "@astrojs/sitemap": "^3.0.0",
     "@astrojs/tailwind": "^5.0.0",
-    "astro": "^6.4.8"
+    "astro": "^6.4.8",
+    "or": "^0.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
