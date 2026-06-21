@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://budgetcart.com',
+  site: 'https://budgetcart.onrender.com',
   integrations: [
     tailwind(),
     sitemap(),
