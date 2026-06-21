@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "budgetcart",
   "version": "1.0.0",
   "description": "BudgetCart - Find the best budget products",
@@ -11,10 +11,10 @@
     "start": "node dist/server/entry.mjs"
   },
   "dependencies": {
-    "astro": "^5.3.0",
-    "@astrojs/tailwind": "^5.1.0",
-    "@astrojs/sitemap": "^3.1.0",
-    "@astrojs/node": "^8.3.0"
+    "@astrojs/node": "^10.1.4",
+    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^6.4.8"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
