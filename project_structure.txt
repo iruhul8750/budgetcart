@@ -1,0 +1,44 @@
+budgetcart/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── public/
+│   ├── images/
+│   │   └── products/
+│   │       └── placeholder.jpg
+│   ├── favicon.ico
+│   └── logo.svg
+├── src/
+│   ├── content/
+│   │   ├── config.ts
+│   │   └── products/
+│   │       └── best-wireless-earphones.md
+│   ├── layouts/
+│   │   ├── BaseLayout.astro
+│   │   └── ProductLayout.astro
+│   ├── components/
+│   │   ├── ProductCard.astro
+│   │   ├── AffiliateButton.astro
+│   │   ├── Header.astro
+│   │   └── Footer.astro
+│   ├── pages/
+│   │   ├── index.astro
+│   │   ├── products/
+│   │   │   └── [slug].astro
+│   │   ├── categories/
+│   │   │   └── [category].astro
+│   │   └── admin/
+│   │       └── index.astro
+│   ├── styles/
+│   │   └── global.css
+│   └── utils/
+│       └── affiliate.js
+├── admin/
+│   └── config.yml
+├── astro.config.mjs
+├── package.json
+├── tsconfig.json
+├── tailwind.config.cjs
+├── .env.example
+├── .gitignore
+└── README.md

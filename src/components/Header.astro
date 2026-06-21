@@ -1,0 +1,43 @@
+<header class="bg-white shadow-md sticky top-0 z-50">
+  <nav class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 text-2xl font-bold text-blue-600 hover:text-blue-700 transition-colors">
+      <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      BudgetCart
+    </a>
+    
+    <div class="hidden md:flex items-center gap-6">
+      <a href="/" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Home</a>
+      <a href="/categories/tech" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Tech</a>
+      <a href="/categories/fashion" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Fashion</a>
+      <a href="/categories/home" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Home</a>
+      <a href="/categories/kitchen" class="text-gray-700 hover:text-blue-600 transition-colors font-medium">Kitchen</a>
+    </div>
+
+    <button class="md:hidden text-gray-700" aria-label="Menu">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu (hidden by default) -->
+  <div class="md:hidden hidden bg-white border-t">
+    <div class="px-4 py-3 space-y-2">
+      <a href="/" class="block text-gray-700 hover:text-blue-600">Home</a>
+      <a href="/categories/tech" class="block text-gray-700 hover:text-blue-600">Tech</a>
+      <a href="/categories/fashion" class="block text-gray-700 hover:text-blue-600">Fashion</a>
+      <a href="/categories/home" class="block text-gray-700 hover:text-blue-600">Home</a>
+      <a href="/categories/kitchen" class="block text-gray-700 hover:text-blue-600">Kitchen</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Mobile menu toggle
+  document.querySelector('button[aria-label="Menu"]')?.addEventListener('click', () => {
+    const menu = document.querySelector('.md\\:hidden.border-t');
+    menu.classList.toggle('hidden');
+  });
+</script>

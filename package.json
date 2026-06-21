@@ -1,0 +1,21 @@
+{
+  "name": "budgetcart",
+  "version": "1.0.0",
+  "description": "BudgetCart - Find the best budget products",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "astro": "^6.4.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tailwindcss": "^3.3.0"
+  }
+}

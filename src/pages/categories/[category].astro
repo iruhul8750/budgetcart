@@ -1,0 +1,56 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const categories = ['Tech', 'Fashion', 'Home', 'Kitchen', 'Accessories', 'Gadgets'];
+  return categories.map((category) => ({
+    params: { category: category.toLowerCase() },
+    props: { category },
+  }));
+}
+
+const { category } = Astro.props;
+const allProducts = await getCollection('products');
+const categoryProducts = allProducts.filter(p => 
+  p.data.category?.toLowerCase() === category.toLowerCase()
+);
+---
+
+<BaseLayout 
+  title={`${category} - BudgetCart`}
+  description={`Best budget ${category} products with honest reviews and exclusive deals`}
+>
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold mb-2">
+        {category} <span class="text-blue-600">Budget Finds</span>
+      </h1>
+      <p class="text-gray-600">
+        {categoryProducts.length} products found in this category
+      </p>
+    </div>
+
+    {categoryProducts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categoryProducts.map((product) => (
+          <ProductCard
+            title={product.data.title}
+            price={product.data.price}
+            image={product.data.image}
+            rating={product.data.rating}
+            slug={product.slug}
+            category={product.data.category}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="text-center py-16 bg-gray-50 rounded-xl">
+        <div class="text-6xl mb-4">🔍</div>
+        <h2 class="text-2xl font-bold mb-2">No products yet</h2>
+        <p class="text-gray-600">Check back soon for budget {category} recommendations!</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>

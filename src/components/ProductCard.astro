@@ -1,0 +1,58 @@
+---
+export interface Props {
+  title: string;
+  price: string;
+  image?: string;
+  rating?: number;
+  slug: string;
+  category?: string;
+}
+
+const { title, price, image, rating, slug, category } = Astro.props;
+---
+
+<a href={`/products/${slug}`} class="block group">
+  <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+    <!-- Image -->
+    <div class="relative h-56 bg-gray-200 overflow-hidden">
+      {image ? (
+        <img 
+          src={image} 
+          alt={title} 
+          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+        />
+      ) : (
+        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100">
+          <span class="text-gray-400 text-sm">No image</span>
+        </div>
+      )}
+      {category && (
+        <span class="absolute top-3 left-3 bg-blue-600 text-white text-xs px-3 py-1 rounded-full">
+          {category}
+        </span>
+      )}
+      {rating && (
+        <span class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-800 text-sm px-3 py-1 rounded-full shadow-md flex items-center gap-1">
+          ⭐ {rating}/5
+        </span>
+      )}
+    </div>
+    
+    <!-- Content -->
+    <div class="p-5">
+      <h3 class="font-semibold text-lg mb-1 group-hover:text-blue-600 transition-colors line-clamp-2">
+        {title}
+      </h3>
+      <div class="flex items-center justify-between mt-3">
+        <span class="text-2xl font-bold text-green-600">{price}</span>
+        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1">
+          View Deal
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</a>

@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { getCollection } from 'astro:content';
+
+const products = await getCollection('products');
+const featuredProducts = products.slice(0, 6);
+const categories = ['Tech', 'Fashion', 'Home', 'Kitchen', 'Accessories', 'Gadgets'];
+---
+
+<BaseLayout 
+  title="BudgetCart - Best Budget Products & Deals" 
+  description="Find honest reviews, best deals, and budget-friendly product recommendations at BudgetCart. Save money on tech, fashion, home, and more!"
+>
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#grid)" />
+      </svg>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 py-16 md:py-24 relative">
+      <div class="max-w-3xl">
+        <div class="flex items-center gap-2 text-blue-200 text-sm font-semibold mb-4">
+          <span class="bg-white/20 px-3 py-1 rounded-full">🔥 Budget Finds</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          Find the Best <br/>
+          <span class="text-yellow-300">Budget Products</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-blue-100 mb-8 max-w-2xl">
+          Honest reviews, real recommendations, and exclusive deals on products you'll love.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#featured" class="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-blue-50 transition-colors shadow-lg">
+            Explore Products →
+          </a>
+          <a href="/categories" class="bg-blue-700/50 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700/70 transition-colors border border-white/20">
+            Browse Categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="bg-white border-b">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div>
+          <div class="text-2xl md:text-3xl font-bold text-blue-600">{products.length}+</div>
+          <div class="text-gray-600 text-sm">Products Reviewed</div>
+        </div>
+        <div>
+          <div class="text-2xl md:text-3xl font-bold text-blue-600">4.5⭐</div>
+          <div class="text-gray-600 text-sm">Average Rating</div>
+        </div>
+        <div>
+          <div class="text-2xl md:text-3xl font-bold text-blue-600">{categories.length}</div>
+          <div class="text-gray-600 text-sm">Categories</div>
+        </div>
+        <div>
+          <div class="text-2xl md:text-3xl font-bold text-blue-600">100%</div>
+          <div class="text-gray-600 text-sm">Honest Reviews</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section id="featured" class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+          🔥 Featured <span class="text-blue-600">Budget Finds</span>
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">
+          Our top picks for the best value products in every category
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featuredProducts.map((product) => (
+          <ProductCard
+            title={product.data.title}
+            price={product.data.price}
+            image={product.data.image}
+            rating={product.data.rating}
+            slug={product.slug}
+            category={product.data.category}
+          />
+        ))}
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="/products" class="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl hover:bg-blue-700 transition-colors font-semibold shadow-lg hover:shadow-blue-600/25">
+          View All Products
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why BudgetCart -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Why <span class="text-blue-600">BudgetCart</span>?</h2>
+      <p class="text-gray-600 max-w-2xl mx-auto mb-12">
+        We're different from other review sites. Here's why you can trust us.
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-6 rounded-2xl bg-gray-50 hover:shadow-xl transition-shadow">
+          <div class="text-5xl mb-4">🔍</div>
+          <h3 class="font-bold text-xl mb-2">Honest Reviews</h3>
+          <p class="text-gray-600">No sponsored bias. We buy and test products ourselves to give you real, unbiased opinions.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-gray-50 hover:shadow-xl transition-shadow">
+          <div class="text-5xl mb-4">💰</div>
+          <h3 class="font-bold text-xl mb-2">Best Deals</h3>
+          <p class="text-gray-600">We constantly monitor prices to bring you the best deals on quality products.</p>
+        </div>
+        <div class="p-6 rounded-2xl bg-gray-50 hover:shadow-xl transition-shadow">
+          <div class="text-5xl mb-4">🛡️</div>
+          <h3 class="font-bold text-xl mb-2">Trusted Recommendations</h3>
+          <p class="text-gray-600">Curated by experts who actually use the products. No fluff, just honest advice.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h2 class="text-3xl font-bold mb-4">📬 Get Budget Deals in Your Inbox</h2>
+      <p class="text-blue-100 mb-8">
+        Subscribe to get the best budget finds and exclusive deals delivered weekly.
+      </p>
+      <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+        <input 
+          type="email" 
+          placeholder="Enter your email" 
+          class="flex-1 px-6 py-3 rounded-xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          required
+        />
+        <button type="submit" class="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-colors">
+          Subscribe Free →
+        </button>
+      </form>
+      <p class="text-blue-200 text-sm mt-4">No spam. Unsubscribe anytime.</p>
+    </div>
+  </section>
+</BaseLayout>

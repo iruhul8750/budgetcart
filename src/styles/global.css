@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-600/25;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-xl transition-all duration-300;
+  }
+  
+  .prose h1 {
+    @apply text-4xl font-bold mb-6;
+  }
+  
+  .prose h2 {
+    @apply text-3xl font-bold mt-10 mb-4;
+  }
+  
+  .prose h3 {
+    @apply text-2xl font-bold mt-8 mb-3;
+  }
+  
+  .prose ul {
+    @apply list-disc ml-6 my-4 space-y-2;
+  }
+  
+  .prose ol {
+    @apply list-decimal ml-6 my-4 space-y-2;
+  }
+  
+  .prose li {
+    @apply mb-2;
+  }
+  
+  .prose p {
+    @apply mb-4 leading-relaxed;
+  }
+  
+  .prose strong {
+    @apply text-blue-600 font-semibold;
+  }
+  
+  .prose blockquote {
+    @apply border-l-4 border-blue-500 pl-4 py-2 my-4 bg-blue-50 rounded-r-lg italic text-gray-700;
+  }
+  
+  .prose img {
+    @apply rounded-xl shadow-lg my-6;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
