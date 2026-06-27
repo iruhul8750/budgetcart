@@ -12,14 +12,67 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
-      - { label: "Product Title", name: "title", widget: "string" }
-      - { label: "Price", name: "price", widget: "string" }
-      - { label: "Category", name: "category", widget: "select", options: ["Tech", "Fashion", "Home", "Kitchen", "Gadgets", "Accessories"] }
-      - { label: "Affiliate Link", name: "affiliateLink", widget: "string" }
-      - { label: "Platform", name: "platform", widget: "select", options: ["Amazon", "Flipkart", "Myntra", "Other"], default: "Amazon" }
-      - { label: "Product Image", name: "image", widget: "image", required: false }
-      - { label: "Rating", name: "rating", widget: "number", valueType: "float", min: 1, max: 5, required: false }
-      - { label: "Short Description", name: "description", widget: "text", required: true }
-      - { label: "Full Review", name: "body", widget: "markdown" }
-      - { label: "Pros", name: "pros", widget: "list", required: false, summary: "{{fields.text}}", field: { label: "Pro", name: "text", widget: "string" } }
-      - { label: "Cons", name: "cons", widget: "list", required: false, summary: "{{fields.text}}", field: { label: "Con", name: "text", widget: "string" } }
+      - label: "Product Title"
+        name: "title"
+        widget: "string"
+      - label: "Price"
+        name: "price"
+        widget: "string"
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - "Tech"
+          - "Fashion"
+          - "Home"
+          - "Kitchen"
+          - "Gadgets"
+          - "Accessories"
+      - label: "Affiliate Link"
+        name: "affiliateLink"
+        widget: "string"
+      - label: "Platform"
+        name: "platform"
+        widget: "select"
+        options:
+          - "Amazon"
+          - "Flipkart"
+          - "Myntra"
+          - "Other"
+        default: "Amazon"
+      - label: "Product Image"
+        name: "image"
+        widget: "image"
+        required: false
+      - label: "Rating"
+        name: "rating"
+        widget: "number"
+        valueType: "float"
+        min: 1
+        max: 5
+        required: false
+      - label: "Short Description"
+        name: "description"
+        widget: "text"
+        required: true
+      - label: "Full Review"
+        name: "body"
+        widget: "markdown"
+      - label: "Pros"
+        name: "pros"
+        widget: "list"
+        required: false
+        summary: "{{fields.text}}"
+        field:
+          label: "Pro"
+          name: "text"
+          widget: "string"
+      - label: "Cons"
+        name: "cons"
+        widget: "list"
+        required: false
+        summary: "{{fields.text}}"
+        field:
+          label: "Con"
+          name: "text"
+          widget: "string"
