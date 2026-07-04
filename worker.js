@@ -42,15 +42,15 @@ export default {
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "application/x-www-form-urlencoded",
               Accept: "application/json",
             },
-            body: JSON.stringify({
+            body: new URLSearchParams({
               client_id: CLIENT_ID,
               client_secret: CLIENT_SECRET,
               code: code,
               redirect_uri: REDIRECT_URI,
-            }),
+            }).toString(),
           }
         );
       } catch (err) {
