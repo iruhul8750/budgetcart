@@ -6,6 +6,8 @@ budgetcart/
 │   ├── images/
 │   │   └── products/
 │   │       └── placeholder.jpg
+│   ├── admin/
+│   │   └── config.yml              ← CMS config for production
 │   ├── favicon.ico
 │   └── logo.svg
 ├── src/
@@ -23,18 +25,15 @@ budgetcart/
 │   │   └── Footer.astro
 │   ├── pages/
 │   │   ├── index.astro
+│   │   ├── admin.astro             ← NEW: Admin page (single file)
 │   │   ├── products/
 │   │   │   └── [slug].astro
-│   │   ├── categories/
-│   │   │   └── [category].astro
-│   │   └── admin/
-│   │       └── index.astro
+│   │   └── categories/
+│   │       └── [category].astro
 │   ├── styles/
 │   │   └── global.css
 │   └── utils/
 │       └── affiliate.js
-├── admin/
-│   └── config.yml
 ├── astro.config.mjs
 ├── package.json
 ├── tsconfig.json
