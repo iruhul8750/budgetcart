@@ -1,4 +1,6 @@
 ﻿---
+import { onMount } from 'solid-js';
+---
 // BudgetCart Admin - Local Development
 // This works with Astro's dev server
 ---
@@ -10,21 +12,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>BudgetCart Admin</title>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 0; padding: 0; }
+      #cms-root { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .login-btn {
+        padding: 12px 24px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1rem;
+        margin-top: 20px;
+      }
+      .login-btn:hover { background: #1d4ed8; }
+      .status { margin-top: 20px; color: #dc2626; }
+    </style>
   </head>
   <body>
     <div id="cms-root">
-      <div style="padding: 20px; font-family: system-ui, sans-serif;">
+      <div style="padding: 20px; text-align: center;">
         <h3>⏳ Loading BudgetCart CMS...</h3>
         <p>If this doesn't load, check your internet connection.</p>
+        <button id="loginBtn" class="login-btn" style="display:none;">Login with GitHub</button>
+        <div id="status" class="status"></div>
       </div>
     </div>
-    
+
     <script>
       console.log("🔧 Initializing BudgetCart Admin...");
-      
+
       function initCMS() {
         const root = document.getElementById('cms-root');
-        
+        const loginBtn = document.getElementById('loginBtn');
+        const status = document.getElementById('status');
+
         if (typeof CMS === 'undefined') {
           root.innerHTML = `
             <div style="padding: 20px; font-family: system-ui, sans-serif; color: #dc2626;">
@@ -38,7 +60,7 @@
           console.error("❌ CMS not available");
           return;
         }
-        
+
         try {
           CMS.init({
             config: {
@@ -72,9 +94,68 @@
               ]
             }
           });
-          
-          root.innerHTML = '<div style="padding: 20px; font-family: system-ui, sans-serif;"><h3>✅ CMS Initialized</h3><p>Loading dashboard...</p></div>';
-          console.log("✅ CMS initialized successfully");
+
+          // Show login button until CMS is ready
+          loginBtn.style.display = 'block';
+          status.textContent = '✅ CMS initialized successfully. Click the button to login.';
+
+          // Listen for postMessage from the OAuth worker
+          window.addEventListener('message', (event) => {
+            if (event.origin !== 'https://budget-cart.onrender.com') return;
+            const data = event.data;
+            if (data.startsWith('authorization:github:success:')) {
+              const payload = data.split(':').slice(3).join(':');
+              const tokenInfo = JSON.parse(payload);
+              // Store token in localStorage or send to CMS
+              localStorage.setItem('github_token', tokenInfo.token);
+              // Reload CMS to use authenticated backend
+              CMS.init({
+                config: {
+                  backend: {
+                    name: 'github',
+                    branch: 'main',
+                    repo: 'YOUR_GITHUB_REPO', // replace with your repo
+                    base_url: 'https://api.github.com',
+                    token: tokenInfo.token
+                  },
+                  media_folder: 'public/images/products',
+                  public_folder: '/images/products',
+                  collections: [
+                    {
+                      name: 'products',
+                      label: 'Products',
+                      folder: 'src/content/products',
+                      create: true,
+                      slug: '{{slug}}',
+                      fields: [
+                        { label: 'Product Title', name: 'title', widget: 'string' },
+                        { label: 'Price', name: 'price', widget: 'string' },
+                        { label: 'Category', name: 'category', widget: 'select', options: ['Tech', 'Fashion', 'Home', 'Kitchen', 'Gadgets', 'Accessories'] },
+                        { label: 'Affiliate Link', name: 'affiliateLink', widget: 'string' },
+                        { label: 'Platform', name: 'platform', widget: 'select', options: ['Amazon', 'Flipkart', 'Myntra', 'Other'], default: 'Amazon' },
+                        { label: 'Product Image', name: 'image', widget: 'image', required: false },
+                        { label: 'Rating', name: 'rating', widget: 'number', valueType: 'float', min: 1, max: 5, required: false },
+                        { label: 'Short Description', name: 'description', widget: 'text', required: true },
+                        { label: 'Full Review', name: 'body', widget: 'markdown' },
+                        { label: 'Pros', name: 'pros', widget: 'list', required: false, summary: '{{fields.text}}', field: { label: 'Pro', name: 'text', widget: 'string' } },
+                        { label: 'Cons', name: 'cons', widget: 'list', required: false, summary: '{{fields.text}}', field: { label: 'Con', name: 'text', widget: 'string' } }
+                      ]
+                    }
+                  ]
+                }
+              });
+              status.textContent = '✅ Logged in and CMS reloaded.';
+            }
+          });
+
+          // Open OAuth flow in a new window
+          loginBtn.addEventListener('click', () => {
+            const authWindow = window.open('/auth', 'GitHub Auth', 'width=600,height=700');
+            if (!authWindow) {
+              status.textContent = '❌ Unable to open authentication window.';
+            }
+          });
+
         } catch (error) {
           console.error("❌ Error:", error);
           root.innerHTML = `
@@ -86,7 +167,7 @@
           `;
         }
       }
-      
+
       // Wait for DOM to load
       if (document.readyState === 'complete') {
         initCMS();
