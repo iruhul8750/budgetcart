@@ -8,12 +8,14 @@ export default {
     const CMS_URL = "https://budget-cart.onrender.com";
     const REDIRECT_URI = `${WORKER_URL}/callback`;
 
+    // Root path – just a health check
     if (url.pathname === "/") {
       return new Response("Worker is running!", {
         headers: { "Content-Type": "text/plain" },
       });
     }
 
+    // OAuth entry point
     if (url.pathname === "/auth") {
       const params = new URLSearchParams({
         client_id: CLIENT_ID,
@@ -26,6 +28,7 @@ export default {
       );
     }
 
+    // OAuth callback – exchange code for token and notify opener
     if (url.pathname === "/callback") {
       const code = url.searchParams.get("code");
       if (!code) {
@@ -96,6 +99,32 @@ export default {
       });
     }
 
+    // Proxy any API or Keystatic requests to the CMS
+    if (url.pathname.startsWith("/api") || url.pathname.startsWith("/keystatic")) {
+      const targetUrl = new URL(url.pathname + url.search, CMS_URL);
+      const proxyRequest = new Request(targetUrl, {
+        method: request.method,
+        headers: request.headers,
+        body: request.body,
+        redirect: "manual",
+      });
+
+      const proxyResponse = await fetch(proxyRequest);
+
+      // Preserve status and headers from the CMS response
+      const headers = new Headers(proxyResponse.headers);
+      // Ensure CORS is allowed for the admin page
+      headers.set("Access-Control-Allow-Origin", "*");
+      headers.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+      return new Response(proxyResponse.body, {
+        status: proxyResponse.status,
+        headers: headers,
+      });
+    }
+
+    // Any other path – 404
     return new Response("Not found", { status: 404 });
   },
 };

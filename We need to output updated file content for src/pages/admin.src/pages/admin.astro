@@ -117,8 +117,7 @@ const CMS_URL = 'https://budget-cart.onrender.com';
 
       const React = await import('react');
       const { createRoot } = await import('react-dom/client');
-      // Import Keystatic as the default export
-      const { default: Keystatic } = await import('@keystatic/astro');
+      const { Keystatic } = await import('@keystatic/astro');
 
       const config = {
         storage: {
@@ -209,8 +208,8 @@ const CMS_URL = 'https://budget-cart.onrender.com';
     });
 
     window.addEventListener('message', (event) => {
-      // Accept messages from either the worker or the CMS
-      if (event.origin !== WORKER_URL && event.origin !== CMS_URL) return;
+      // Listen for messages from the worker callback
+      if (event.origin !== CMS_URL) return;
       fallbackStatus.textContent = '✅ Authentication successful! Redirecting...';
       setTimeout(() => window.location.href = '/', 1500);
     });

@@ -1,0 +1,43 @@
+budgetcart/
+├── .github/
+│   └── workflows/
+│       └── deploy.yml              # Render auto-deploy workflow
+├── src/
+│   ├── content/
+│   │   ├── config.ts               # Keystatic content config
+│   │   └── products/
+│   │       └── sample-product.md   # Product reviews
+│   ├── layouts/
+│   │   ├── BaseLayout.astro        # Global layout
+│   │   └── ProductLayout.astro     # Product page layout
+│   ├── components/
+│   │   ├── ProductCard.astro       # Product card component
+│   │   ├── AffiliateButton.astro   # Affiliate link button
+│   │   ├── Header.astro            # Site header
+│   │   └── Footer.astro            # Site footer
+│   ├── pages/
+│   │   ├── index.astro             # Homepage
+│   │   ├── products/
+│   │   │   └── [slug].astro        # Dynamic product page
+│   │   ├── categories/
+│   │   │   └── [category].astro    # Category page
+│   │   └── api/
+│   │       └── keystatic/
+│   │           └── [...path].astro # Keystatic API routes
+│   ├── styles/
+│   │   └── global.css              # Global styles
+│   └── utils/
+│       └── affiliate.js            # Affiliate link helpers
+├── public/
+│   ├── images/
+│   │   └── products/               # Product images
+│   └── favicon.ico
+├── keystatic/
+│   └── config.ts                   # Keystatic configuration
+├── astro.config.mjs                # Astro configuration
+├── package.json                    # Dependencies
+├── tsconfig.json                   # TypeScript config
+├── tailwind.config.cjs             # Tailwind configuration
+├── .env.example                    # Environment variables
+├── .gitignore                      # Git ignore file
+└── README.md                       # Project documentation
