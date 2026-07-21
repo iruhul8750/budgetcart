@@ -1,0 +1,7 @@
+name = "budgetcart-oauth-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+GITHUB_CLIENT_ID = "Ov23lixkEagiMqMJRgsh"
+GITHUB_CLIENT_SECRET = "c50e16aef4bf3e79e1c63c894523d59bf047010b"

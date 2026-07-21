@@ -1,10 +1,12 @@
 ---
-const KEYSTATIC_SECRET = import.meta.env.KEYSTATIC_SECRET || '';
-const GITHUB_CLIENT_ID = import.meta.env.GITHUB_CLIENT_ID || '';
-const GITHUB_CLIENT_SECRET = import.meta.env.GITHUB_CLIENT_SECRET || '';
+// src/pages/admin.astro
+// Login page that redirects to Keystatic dashboard
 const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:4321';
-const WORKER_URL = 'https://budgetcart-oauth-proxy.careermaker1075.workers.dev';
-const CMS_URL = 'https://budget-cart.onrender.com';
+const isLocal = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1');
+const WORKER_URL = isLocal 
+  ? 'http://localhost:8787' 
+  : 'https://budgetcart-oauth-proxy.careermaker1075.workers.dev';
+const DASHBOARD_URL = '/admin'; // Keystatic dashboard
 ---
 
 <!DOCTYPE html>
@@ -29,23 +31,11 @@ const CMS_URL = 'https://budget-cart.onrender.com';
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      max-width: 900px;
+      max-width: 500px;
       width: 100%;
-    }
-    .status { margin: 16px 0; padding: 12px; border-radius: 6px; }
-    .loading { color: #6b7280; background: #f3f4f6; }
-    .success { color: #16a34a; background: #f0fdf4; }
-    .error { color: #dc2626; background: #fef2f2; }
-    #keystatic-root { min-height: 400px; }
-    .fallback {
-      margin-top: 20px;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      display: none;
       text-align: center;
     }
-    .fallback-btn {
+    .login-btn {
       padding: 16px 32px;
       background: #2563eb;
       color: white;
@@ -58,161 +48,67 @@ const CMS_URL = 'https://budget-cart.onrender.com';
       align-items: center;
       gap: 12px;
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      margin-top: 20px;
     }
-    .fallback-btn:hover { background: #1d4ed8; }
-    .fallback-btn img { height: 24px; }
+    .login-btn:hover { background: #1d4ed8; }
+    .login-btn img { height: 24px; }
+    .status { margin-top: 16px; padding: 12px; border-radius: 6px; }
+    .loading { color: #6b7280; background: #f3f4f6; }
+    .success { color: #16a34a; background: #f0fdf4; }
+    .error { color: #dc2626; background: #fef2f2; }
+    .env-badge {
+      margin-top: 20px;
+      padding: 8px 16px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: #4b5563;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🛒 BudgetCart Admin</h1>
-    <div id="status" class="status loading">⏳ Loading Keystatic...</div>
-    <div id="keystatic-root"></div>
-    <div id="fallback" class="fallback">
-      <p style="color: #6b7280; margin-bottom: 12px;">Login with GitHub:</p>
-      <button id="manualLoginBtn" class="fallback-btn">
-        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
-        Login with GitHub (fallback)
-      </button>
-      <div id="fallbackStatus" style="margin-top: 12px;"></div>
-    </div>
+    <p style="color: #6b7280; margin: 16px 0;">Login to manage your products</p>
+    <button id="loginBtn" class="login-btn">
+      <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+      Login with GitHub
+    </button>
+    <div id="status" class="status loading">⏳ Ready to login...</div>
+    <div class="env-badge" id="envBadge">🌐 Environment: Loading...</div>
   </div>
 
-  <script>
-    // Inject env vars to client
-    window.__ENV__ = {
-      KEYSTATIC_SECRET: "${KEYSTATIC_SECRET}",
-      GITHUB_CLIENT_ID: "${GITHUB_CLIENT_ID}",
-      GITHUB_CLIENT_SECRET: "${GITHUB_CLIENT_SECRET}",
-      SITE_URL: "${SITE_URL}",
-      WORKER_URL: "${WORKER_URL}",
-      CMS_URL: "${CMS_URL}"
-    };
-    console.log('📦 Env injected:', Object.keys(window.__ENV__));
-  </script>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "react": "https://esm.sh/react@18.2.0",
-      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-      "@keystatic/astro": "https://esm.sh/@keystatic/astro@5.2.0"
-    }
-  }
-  </script>
-
-  <script type="module">
-    console.log('🔧 Loading Keystatic Admin...');
+  <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
+    const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
+    document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
+    
+    const loginBtn = document.getElementById('loginBtn');
     const status = document.getElementById('status');
-    const root = document.getElementById('keystatic-root');
-    const fallback = document.getElementById('fallback');
-    const fallbackStatus = document.getElementById('fallbackStatus');
-    const manualBtn = document.getElementById('manualLoginBtn');
 
-    try {
-      const env = window.__ENV__ || {};
-      if (!env.KEYSTATIC_SECRET || !env.GITHUB_CLIENT_ID || !env.GITHUB_CLIENT_SECRET) {
-        throw new Error('Missing environment variables in .env');
-      }
-
-      const React = await import('react');
-      const { createRoot } = await import('react-dom/client');
-      // Import Keystatic as the default export
-      const { default: Keystatic } = await import('@keystatic/astro');
-
-      const config = {
-        storage: {
-          kind: 'github',
-          repo: { owner: 'iruhul8750', name: 'budgetcart' },
-          clientId: env.GITHUB_CLIENT_ID,
-          clientSecret: env.GITHUB_CLIENT_SECRET,
-        },
-        secret: env.KEYSTATIC_SECRET,
-        // Point Keystatic to the worker domain so that all API calls go through the proxy
-        baseUrl: env.WORKER_URL,
-        collections: {
-          products: {
-            label: 'Products',
-            slugField: 'title',
-            path: 'src/content/products/*',
-            format: { contentField: 'body' },
-            schema: {
-              title: { kind: 'slug', name: { label: 'Product Title' } },
-              price: { kind: 'text', label: 'Price' },
-              category: {
-                kind: 'select',
-                label: 'Category',
-                options: [
-                  { value: 'tech', label: 'Tech' },
-                  { value: 'fashion', label: 'Fashion' },
-                  { value: 'home', label: 'Home' },
-                  { value: 'kitchen', label: 'Kitchen' },
-                  { value: 'gadgets', label: 'Gadgets' },
-                  { value: 'accessories', label: 'Accessories' }
-                ]
-              },
-              affiliateLink: { kind: 'text', label: 'Affiliate Link' },
-              platform: {
-                kind: 'select',
-                label: 'Platform',
-                options: [
-                  { value: 'amazon', label: 'Amazon' },
-                  { value: 'flipkart', label: 'Flipkart' },
-                  { value: 'myntra', label: 'Myntra' },
-                  { value: 'other', label: 'Other' }
-                ]
-              },
-              image: { kind: 'image', label: 'Product Image' },
-              rating: { kind: 'number', label: 'Rating' },
-              description: { kind: 'text', label: 'Short Description' },
-              body: { kind: 'markdown', label: 'Full Review' },
-              pros: { kind: 'array', label: 'Pros', item: { kind: 'text' } },
-              cons: { kind: 'array', label: 'Cons', item: { kind: 'text' } },
-              pubDate: { kind: 'date', label: 'Publication Date' }
-            }
-          }
-        }
-      };
-
-      const KeystaticComponent = Keystatic;
-      const reactRoot = createRoot(root);
-      reactRoot.render(React.createElement(KeystaticComponent, { config }));
-
+    // ✅ Check if already logged in
+    const token = localStorage.getItem('github_token');
+    if (token) {
       status.className = 'status success';
-      status.textContent = '✅ Admin ready.';
-
-      // After 3 seconds, if no login button appears, show fallback
-      setTimeout(() => {
-        const hasLoginButton = root.querySelector('button') !== null;
-        if (!hasLoginButton) {
-          console.warn('⚠️ Keystatic login button not detected. Showing fallback.');
-          fallback.style.display = 'block';
-        } else {
-          console.log('✅ Keystatic login button detected.');
-        }
-      }, 3000);
-
-    } catch (error) {
-      console.error('❌ Error:', error);
-      status.className = 'status error';
-      status.innerHTML = `❌ ${error.message}`;
-      fallback.style.display = 'block';
-      fallbackStatus.textContent = '⚠️ Keystatic failed. Use the manual login below.';
+      status.textContent = '✅ Already logged in! Redirecting to dashboard...';
+      loginBtn.disabled = true;
+      loginBtn.style.opacity = '0.5';
+      setTimeout(() => window.location.href = DASHBOARD_URL, 1000);
     }
 
-    // --- Fallback: Manual Login using Cloudflare Worker ---
-    const WORKER_URL = 'https://budgetcart-oauth-proxy.careermaker1075.workers.dev';
+    // ✅ Check for code from GitHub
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+      status.className = 'status loading';
+      status.textContent = '⏳ Completing authentication...';
+      window.location.href = WORKER_URL + '/auth/callback?code=' + code;
+    }
 
-    manualBtn.addEventListener('click', () => {
-      fallbackStatus.textContent = '⏳ Redirecting to GitHub...';
-      window.open(`${WORKER_URL}/auth`, 'GitHub Auth', 'width=600,height=700');
-    });
-
-    window.addEventListener('message', (event) => {
-      // Accept messages from either the worker or the CMS
-      if (event.origin !== WORKER_URL && event.origin !== CMS_URL) return;
-      fallbackStatus.textContent = '✅ Authentication successful! Redirecting...';
-      setTimeout(() => window.location.href = '/', 1500);
+    loginBtn.addEventListener('click', function() {
+      status.className = 'status loading';
+      status.textContent = '⏳ Redirecting to GitHub...';
+      window.location.href = WORKER_URL + '/auth';
     });
   </script>
 </body>
