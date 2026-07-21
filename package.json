@@ -1,7 +1,7 @@
 {
   "name": "budgetcart",
   "version": "1.0.0",
-  "description": "BudgetCart - Find the best budget products with honest reviews and affiliate deals",
+  "description": "BudgetCart - Find the best budget products",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
@@ -15,8 +15,8 @@
     "@astrojs/tailwind": "^5.0.0",
     "tailwindcss": "^3.3.0",
     "@astrojs/node": "^8.0.0",
-    "@keystatic/astro": "^4.0.0",
-    "@keystatic/core": "^4.0.0",
+    "@keystatic/astro": "^5.2.0",
+    "@keystatic/core": "^0.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
