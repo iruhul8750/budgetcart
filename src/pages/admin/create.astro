@@ -1,0 +1,208 @@
+---
+// src/pages/admin/create.astro
+// Create new product page
+---
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Product</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+    .back-link {
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .back-link:hover { text-decoration: underline; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 4px;
+      font-size: 0.9rem;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .btn-submit {
+      padding: 10px 32px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .btn-submit:hover { background: #1d4ed8; }
+    .btn-cancel {
+      padding: 10px 32px;
+      background: #e5e7eb;
+      color: #4b5563;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn-cancel:hover { background: #d1d5db; }
+    @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>➕ Create Product</h1>
+      <a href="/admin/dashboard" class="back-link">← Back to Dashboard</a>
+      <form id="createForm">
+        <div class="form-group">
+          <label>Product Title *</label>
+          <input type="text" name="title" required placeholder="Best Wireless Earphones Under ₹2000" />
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Price *</label>
+            <input type="text" name="price" required placeholder="e.g., ₹1,999" />
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+              <option value="">Select...</option>
+              <option value="Tech">Tech</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Home">Home</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Gadgets">Gadgets</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Affiliate Link *</label>
+            <input type="url" name="affiliateLink" required placeholder="https://amazon.in/dp/..." />
+          </div>
+          <div class="form-group">
+            <label>Platform</label>
+            <select name="platform">
+              <option value="Amazon">Amazon</option>
+              <option value="Flipkart">Flipkart</option>
+              <option value="Myntra">Myntra</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Product Image URL</label>
+          <input type="url" name="image" placeholder="/images/products/your-image.jpg" />
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Rating (1-5)</label>
+            <input type="number" name="rating" min="1" max="5" step="0.1" placeholder="4.5" />
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Short Description *</label>
+          <input type="text" name="description" required placeholder="Brief description of the product" />
+        </div>
+        
+        <div class="form-group">
+          <label>Full Review (Markdown) *</label>
+          <textarea name="body" required placeholder="# Product Title&#10;&#10;## Why We Recommend This&#10;Your full review here..."></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Pros (one per line)</label>
+            <textarea name="pros" rows="3" placeholder="Crystal clear audio&#10;30-hour battery life"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Cons (one per line)</label>
+            <textarea name="cons" rows="3" placeholder="Case feels cheap&#10;No wireless charging"></textarea>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">🚀 Create Product</button>
+          <a href="/admin/dashboard" class="btn-cancel">Cancel</a>
+        </div>
+      </form>
+      <div id="status" style="margin-top: 12px;"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const status = document.getElementById('status');
+      status.textContent = '⏳ Creating product...';
+      status.style.color = '#6b7280';
+      
+      const formData = new FormData(form);
+      const data = {};
+      formData.forEach((value, key) => {
+        if (key === 'pros' || key === 'cons') {
+          data[key] = value.split('\n').filter(Boolean);
+        } else {
+          data[key] = value;
+        }
+      });
+      
+      try {
+        const res = await fetch('/api/products/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (res.ok) {
+          status.textContent = '✅ Product created successfully! Redirecting...';
+          status.style.color = '#16a34a';
+          setTimeout(() => window.location.href = '/admin/dashboard', 1500);
+        } else {
+          status.textContent = '❌ Error: ' + (result.error || 'Unknown error');
+          status.style.color = '#dc2626';
+        }
+      } catch (e) {
+        status.textContent = '❌ Network error: ' + e.message;
+        status.style.color = '#dc2626';
+      }
+    });
+  </script>
+</body>
+</html>

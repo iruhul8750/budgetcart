@@ -1,0 +1,33 @@
+---
+// src/pages/api/products/[slug].astro
+// API endpoint for deleting products
+export const prerender = false;
+
+import fs from 'fs/promises';
+import path from 'path';
+
+export async function DELETE({ params }) {
+  try {
+    const { slug } = params;
+    if (!slug) {
+      return new Response(JSON.stringify({ error: 'Slug is required' }), { status: 400 });
+    }
+    
+    const filePath = path.join(process.cwd(), 'src', 'content', 'products', `${slug}.md`);
+    
+    // Check if file exists
+    try {
+      await fs.access(filePath);
+    } catch {
+      return new Response(JSON.stringify({ error: 'Product not found' }), { status: 404 });
+    }
+    
+    // Delete the file
+    await fs.unlink(filePath);
+    
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (error) {
+    console.error('Delete error:', error);
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+}
