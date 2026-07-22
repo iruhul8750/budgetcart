@@ -9,4 +9,8 @@ export default defineConfig({
     mode: 'standalone',
   }),
   integrations: [tailwind()],
+  server: {
+    host: '0.0.0.0',
+    port: 10000,
+  },
 });
