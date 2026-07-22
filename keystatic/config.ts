@@ -10,7 +10,7 @@ export default config({
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
   },
-  secret: process.env.KEYSTATIC_SECRET,
+  secret: process.env.KEYSTATIC_SECRET || 'development-secret-key',
   baseUrl: process.env.SITE_URL || 'http://localhost:4321',
   collections: {
     products: collection({

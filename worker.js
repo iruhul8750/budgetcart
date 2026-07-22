@@ -1,4 +1,4 @@
-// worker.js – GitHub OAuth Proxy with Keystatic Dashboard Redirect
+// worker.js – GitHub OAuth Proxy with Cookie Support
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -14,10 +14,7 @@ export default {
 
     // --- /auth — redirect to GitHub OAuth ---
     if (url.pathname === "/auth") {
-      // ✅ Use the exact same URL that's registered in GitHub
-      const redirectUri = `http://localhost:8787/auth/callback`;
-      // or for production: `https://budgetcart-oauth-proxy.careermaker1075.workers.dev/auth/callback`
-      
+      const redirectUri = `https://${url.hostname}/auth/callback`;
       const params = new URLSearchParams({
         client_id: CLIENT_ID,
         redirect_uri: redirectUri,
@@ -57,7 +54,9 @@ export default {
           );
         }
 
-        // ✅ Redirect to Keystatic admin dashboard with token stored
+        const accessToken = tokenData.access_token;
+
+        // ✅ Success HTML – stores token in both localStorage and cookie
         const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -107,9 +106,14 @@ export default {
     <p class="success">✅ Redirecting to admin dashboard...</p>
   </div>
   <script>
-    // Store token in localStorage
-    localStorage.setItem('github_token', '${tokenData.access_token}');
-    // Redirect to Keystatic admin dashboard
+    // ✅ Store token in localStorage
+    const token = '${accessToken}';
+    localStorage.setItem('github_token', token);
+    
+    // ✅ Store token in cookie (for cross-page persistence)
+    document.cookie = 'github_token=' + token + '; path=/; max-age=3600; SameSite=Lax';
+    
+    // ✅ Redirect to admin page (which will then redirect to dashboard)
     window.location.href = '/admin';
   </script>
 </body>
@@ -129,8 +133,6 @@ export default {
 
     // --- /admin — redirect to the Keystatic admin dashboard ---
     if (url.pathname === "/admin") {
-      // This handles the case where someone visits the worker's /admin path
-      // Redirect to the actual Keystatic admin on your site
       const siteUrl = env.SITE_URL || 'https://budget-cart.onrender.com';
       return Response.redirect(`${siteUrl}/admin`, 302);
     }
