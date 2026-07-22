@@ -1,43 +1,20 @@
 budgetcart/
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
-├── public/
-│   ├── images/
-│   │   └── products/
-│   │       └── placeholder.jpg
-│   ├── admin/
-│   │   └── config.yml              ← CMS config for production
-│   ├── favicon.ico
-│   └── logo.svg
 ├── src/
-│   ├── content/
-│   │   ├── config.ts
-│   │   └── products/
-│   │       └── best-wireless-earphones.md
-│   ├── layouts/
-│   │   ├── BaseLayout.astro
-│   │   └── ProductLayout.astro
-│   ├── components/
-│   │   ├── ProductCard.astro
-│   │   ├── AffiliateButton.astro
-│   │   ├── Header.astro
-│   │   └── Footer.astro
 │   ├── pages/
+│   │   ├── admin.astro          ← Login page
+│   │   ├── admin/
+│   │   │   └── dashboard.astro  ← Dashboard (after login)
 │   │   ├── index.astro
-│   │   ├── admin.astro             ← NEW: Admin page (single file)
-│   │   ├── products/
-│   │   │   └── [slug].astro
-│   │   └── categories/
-│   │       └── [category].astro
-│   ├── styles/
-│   │   └── global.css
-│   └── utils/
-│       └── affiliate.js
+│   │   ├── categories/
+│   │   │   └── [category].astro
+│   │   └── products/
+│   │       └── [slug].astro
+│   ├── layouts/
+│   ├── components/
+│   ├── content/
+│   │   └── products/
+│   └── styles/
+├── public/
 ├── astro.config.mjs
 ├── package.json
-├── tsconfig.json
-├── tailwind.config.cjs
-├── .env.example
-├── .gitignore
-└── README.md
+└── worker.js

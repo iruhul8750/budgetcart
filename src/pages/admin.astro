@@ -5,7 +5,7 @@ const isLocal = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1')
 const WORKER_URL = isLocal 
   ? 'http://localhost:8787' 
   : 'https://budgetcart-oauth-proxy.careermaker1075.workers.dev';
-const DASHBOARD_URL = '/keystatic';
+const DASHBOARD_URL = '/admin/dashboard';
 ---
 
 <!DOCTYPE html>
@@ -64,16 +64,6 @@ const DASHBOARD_URL = '/keystatic';
       color: #4b5563;
       display: inline-block;
     }
-    .debug {
-      margin-top: 16px;
-      padding: 12px;
-      background: #f3f4f6;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      color: #4b5563;
-      word-break: break-all;
-      display: block;
-    }
   </style>
 </head>
 <body>
@@ -86,7 +76,6 @@ const DASHBOARD_URL = '/keystatic';
     </button>
     <div id="status" class="status loading">⏳ Ready to login...</div>
     <div class="env-badge" id="envBadge">🌐 Environment: Loading...</div>
-    <div class="debug" id="debugInfo"></div>
   </div>
 
   <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
@@ -95,33 +84,9 @@ const DASHBOARD_URL = '/keystatic';
     
     const loginBtn = document.getElementById('loginBtn');
     const status = document.getElementById('status');
-    const debug = document.getElementById('debugInfo');
 
-    // ✅ Helper to get cookie value
-    function getCookie(name) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop().split(';').shift();
-      return null;
-    }
-
-    // ✅ Check for token in localStorage OR cookie
-    let token = localStorage.getItem('github_token');
-    if (!token) {
-      token = getCookie('github_token');
-      if (token) {
-        localStorage.setItem('github_token', token);
-      }
-    }
-
-    debug.innerHTML = `
-      Token in localStorage: ${localStorage.getItem('github_token') ? '✅' : '❌'}<br>
-      Token in cookie: ${getCookie('github_token') ? '✅' : '❌'}<br>
-      Token value: ${token ? token.substring(0, 20) + '...' : 'No token'}<br>
-      Dashboard URL: ${DASHBOARD_URL}
-    `;
-
-    // ✅ If token exists, redirect to dashboard
+    // ✅ Check for token - redirect to dashboard
+    const token = localStorage.getItem('github_token');
     if (token) {
       status.className = 'status success';
       status.textContent = '✅ Already logged in! Redirecting to dashboard...';
