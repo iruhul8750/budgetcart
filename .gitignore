@@ -43,3 +43,5 @@ Thumbs.db
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+.env.ai
+ai/output/

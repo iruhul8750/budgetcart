@@ -1,31 +1,131 @@
 Developer Push
-      |
-      ↓
+       │
+       ▼
 GitHub Actions
-      |
-      ↓
-Install Node + Dependencies
-      |
-      ↓
-Build Astro Project
-      |
-      ↓
-Run Playwright Tests
-      |
-      ├── PASS ✅
-      |
-      └── FAIL ❌
-             |
-             ↓
-       Capture Screenshot
-       Capture Trace
-       Capture Logs
-             |
-             ↓
-       AI Agent
-             |
-             ↓
-       Analyze Bug
-             |
-             ↓
-       Create Fix PR
+       │
+       ▼
+Deploy Dev
+       │
+       ▼
+Playwright
+       │
+ ┌─────┴────────┐
+ │              │
+PASS          FAIL
+ │              │
+ ▼              ▼
+Done     Collect Context
+                │
+                ▼
+        Ollama Cloud
+                │
+                ▼
+     Generate Updated Files
+                │
+                ▼
+     Replace Existing Files
+                │
+                ▼
+        Build Project
+                │
+                ▼
+        Playwright Again
+         │            │
+      PASS          FAIL
+         │            │
+         ▼            ▼
+ Create Branch     Create Issue
+         │
+         ▼
+ Create Pull Request
+         │
+         ▼
+ Human Review
+         │
+         ▼
+ Merge to dev
+         │
+         ▼
+ Merge to main
+
+
+Phase 2 — Better Playwright Reports
+
+Playwright
+      │
+      ▼
+Failure
+      │
+      ▼
+Save
+ ├── screenshot
+ ├── trace.zip
+ ├── html report
+ ├── console logs
+ └── junit xml
+
+
+Phase 3 — AI Agent
+
+ ai/
+├── prompts/
+│   ├── fix_bug.md
+│   └── system.md
+│
+├── scripts/
+│   ├── collect-context.js
+│   ├── call-ollama.js
+│   ├── apply-fix.js
+│   ├── rerun-tests.js
+│   └── create-pr.js
+│
+├── output/
+│
+└── config.js
+
+Phase 4 — Failure Workflow
+.github/workflows/ai-repair.yml
+
+
+Phase 5 — Collect Context
+
+Repository Tree
+Changed Files
+Playwright Error
+Stack Trace
+Screenshot
+trace.zip
+HTML Report
+Console Logs
+Current Commit
+Package.json
+playwright.config.js
+Related Source Files
+
+Phase 6 — Ollama Cloud
+
+You are a senior software engineer.
+Goal:
+Fix only the failing Playwright test.
+Rules:
+Do not modify unrelated files.
+Do not refactor.
+Preserve coding style.
+Return ONLY updated file contents.
+
+Phase 7 — Apply Changes
+
+AI
+      │
+      ▼
+Updated files
+      │
+      ▼
+Overwrite repository files
+
+Phase 8 — Verify
+npm install
+↓
+npm run build
+↓
+Playwright
