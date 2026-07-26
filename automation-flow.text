@@ -1,0 +1,31 @@
+Developer Push
+      |
+      ↓
+GitHub Actions
+      |
+      ↓
+Install Node + Dependencies
+      |
+      ↓
+Build Astro Project
+      |
+      ↓
+Run Playwright Tests
+      |
+      ├── PASS ✅
+      |
+      └── FAIL ❌
+             |
+             ↓
+       Capture Screenshot
+       Capture Trace
+       Capture Logs
+             |
+             ↓
+       AI Agent
+             |
+             ↓
+       Analyze Bug
+             |
+             ↓
+       Create Fix PR
