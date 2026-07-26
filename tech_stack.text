@@ -1,9 +1,9 @@
-| Component          | Technology            | Role / Benefit                                                                                                       |
-| ------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Frontend Framework | Astro                 | Generates pure, lightning-fast static HTML pages for excellent SEO and performance.                                  |
-| Styling            | Tailwind CSS          | Utility-first CSS framework for building responsive and maintainable user interfaces.                                |
-| CMS Engine         | Keystatic             | Modern Git-based CMS that works locally without a database and syncs content securely through GitHub.                |
-| Server Adapter     | @astrojs/node         | Enables Astro to run server-side functionality on Render, including secure admin authentication.                     |
-| Database Storage   | GitHub Markdown (.md) | Stores products and content as Markdown files directly in the GitHub repository, eliminating database hosting costs. |
-| Hosting Platform   | Render (Web Service)  | Hosts the website and runs the backend services required for secure admin authentic                                  |
+| Component          | Technology                   | Role / Benefit                                                                                                       |
+| ------------------ | ------------------------     | -------------------------------------------------------------------------------------------------------------------- |
+| Frontend Framework | Astro                        | Generates pure, lightning-fast static HTML pages for excellent SEO and performance.                                  |
+| Styling            | Tailwind CSS                 | Utility-first CSS framework for building responsive and maintainable user interfaces.                                |
+| CMS Engine         | Keystatic/static dashbaord    | Modern Git-based CMS that works locally without a database and syncs content securely through GitHub.                |
+| Server Adapter     | @astrojs/node                | Enables Astro to run server-side functionality on Render, including secure admin authentication.                     |
+| Database Storage   | GitHub Markdown (.md)        | Stores products and content as Markdown files directly in the GitHub repository, eliminating database hosting costs. |
+| Hosting Platform   | Render (Web Service)         | Hosts the website and runs the backend services required for secure admin authentic                                  |
 

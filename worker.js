@@ -1,9 +1,11 @@
-// worker.js – GitHub OAuth Proxy with Cookie Support
+// worker.js – GitHub OAuth Proxy
+// ✅ Uses SITE_URL from environment – no hardcoding
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const CLIENT_ID = env.GITHUB_CLIENT_ID;
     const CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
+    const SITE_URL = env.SITE_URL || 'https://budget-cart.onrender.com';
 
     if (!CLIENT_ID || !CLIENT_SECRET) {
       return new Response("Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET in environment", {
@@ -24,7 +26,7 @@ export default {
       return Response.redirect(githubAuthUrl, 302);
     }
 
-    // --- /auth/callback — exchange code for token and redirect to admin ---
+    // --- /auth/callback — exchange code for token and redirect to SITE_URL/admin ---
     if (url.pathname === "/auth/callback") {
       const code = url.searchParams.get("code");
       if (!code) {
@@ -56,7 +58,7 @@ export default {
 
         const accessToken = tokenData.access_token;
 
-        // ✅ Success HTML – stores token in both localStorage and cookie
+        // ✅ Redirect to SITE_URL/admin (from env)
         const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -106,15 +108,11 @@ export default {
     <p class="success">✅ Redirecting to admin dashboard...</p>
   </div>
   <script>
-    // ✅ Store token in localStorage
     const token = '${accessToken}';
     localStorage.setItem('github_token', token);
-    
-    // ✅ Store token in cookie (for cross-page persistence)
     document.cookie = 'github_token=' + token + '; path=/; max-age=3600; SameSite=Lax';
-    
-    // ✅ Redirect to admin page (which will then redirect to dashboard)
-    window.location.href = '/admin';
+    // ✅ Redirect to SITE_URL/admin (from env)
+    window.location.href = '${SITE_URL}/admin';
   </script>
 </body>
 </html>`;
@@ -131,10 +129,9 @@ export default {
       }
     }
 
-    // --- /admin — redirect to the Keystatic admin dashboard ---
+    // --- /admin — redirect to SITE_URL/admin ---
     if (url.pathname === "/admin") {
-      const siteUrl = env.SITE_URL || 'https://budget-cart.onrender.com';
-      return Response.redirect(`${siteUrl}/admin`, 302);
+      return Response.redirect(`${SITE_URL}/admin`, 302);
     }
 
     // --- Root ---

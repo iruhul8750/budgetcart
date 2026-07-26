@@ -1,11 +1,12 @@
 ---
 // src/pages/admin.astro
-const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:4321';
+// ✅ Uses SITE_URL from .env – no hardcoding
+const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:10000';
 const isLocal = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1');
 const WORKER_URL = isLocal 
-  ? 'http://localhost:8787' 
+  ? 'http://127.0.0.1:8787' 
   : 'https://budgetcart-oauth-proxy.careermaker1075.workers.dev';
-const DASHBOARD_URL = '/admin/dashboard';
+const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
 ---
 
 <!DOCTYPE html>
@@ -79,26 +80,25 @@ const DASHBOARD_URL = '/admin/dashboard';
   </div>
 
   <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
+    console.log('🌐 SITE_URL:', SITE_URL);
+    console.log('🔧 WORKER_URL:', WORKER_URL);
+    
     const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
     document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
     
     const loginBtn = document.getElementById('loginBtn');
     const status = document.getElementById('status');
 
-    // ✅ Check for token - redirect to dashboard
     const token = localStorage.getItem('github_token');
     if (token) {
       status.className = 'status success';
       status.textContent = '✅ Already logged in! Redirecting to dashboard...';
       loginBtn.disabled = true;
       loginBtn.style.opacity = '0.5';
-      setTimeout(() => {
-        window.location.href = DASHBOARD_URL;
-      }, 1000);
+      setTimeout(() => window.location.href = DASHBOARD_URL, 1000);
       return;
     }
 
-    // ✅ Check for code from GitHub callback
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     if (code) {
