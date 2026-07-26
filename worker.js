@@ -1,5 +1,5 @@
 // worker.js – GitHub OAuth Proxy
-// ✅ Uses SITE_URL from environment – no hardcoding
+// ✅ Uses SITE_URL from environment (Cloudflare Worker env)
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);

@@ -1,7 +1,7 @@
 ---
 // src/pages/admin.astro
-// ✅ Uses SITE_URL from .env – no hardcoding
-const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:10000';
+// ✅ Uses SITE_URL from .env (local) or Render env (production)
+const SITE_URL = import.meta.env.SITE_URL || 'https://budget-cart.onrender.com';
 const isLocal = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1');
 const WORKER_URL = isLocal 
   ? 'http://127.0.0.1:8787' 
@@ -82,6 +82,7 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
   <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
     console.log('🌐 SITE_URL:', SITE_URL);
     console.log('🔧 WORKER_URL:', WORKER_URL);
+    console.log('📊 DASHBOARD_URL:', DASHBOARD_URL);
     
     const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
     document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
@@ -89,16 +90,36 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
     const loginBtn = document.getElementById('loginBtn');
     const status = document.getElementById('status');
 
-    const token = localStorage.getItem('github_token');
+    // ✅ Function to get cookie value
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    // ✅ Check for token in localStorage OR cookie
+    let token = localStorage.getItem('github_token');
+    if (!token) {
+      token = getCookie('github_token');
+      if (token) {
+        localStorage.setItem('github_token', token);
+      }
+    }
+
+    // ✅ If token exists, redirect to dashboard
     if (token) {
       status.className = 'status success';
       status.textContent = '✅ Already logged in! Redirecting to dashboard...';
       loginBtn.disabled = true;
       loginBtn.style.opacity = '0.5';
-      setTimeout(() => window.location.href = DASHBOARD_URL, 1000);
+      setTimeout(() => {
+        window.location.href = DASHBOARD_URL;
+      }, 1000);
       return;
     }
 
+    // ✅ Check for code from GitHub callback
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     if (code) {
