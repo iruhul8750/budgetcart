@@ -8,7 +8,14 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "start": "node dist/server/entry.mjs"
+    "start": "node dist/server/entry.mjs",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report",
+    "test:codegen": "playwright codegen",
+    "test:chromium": "playwright test --project=chromium"
   },
   "dependencies": {
     "@astrojs/node": "^8.0.0",
@@ -18,6 +25,9 @@
     "wrangler": "^4.113.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0"
+    "@playwright/test": "^1.62.0",
+    "@types/node": "^20.0.0",
+    "dotenv": "^17.4.2",
+    "wait-on": "^9.1.0"
   }
 }
