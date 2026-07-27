@@ -1,0 +1,12 @@
+src/
+├── content/
+│   ├── config.ts                 # Product schema with affiliate fields
+│   └── products/                 # Product markdown files
+│       └── sample.md
+├── lib/
+│   └── product-crud.js          # CRUD operations (optional - for future use)
+└── pages/
+    ├── admin/
+    │   ├── login.astro          # Login page (formerly index.astro)
+    │   └── dashboard.astro      # Dashboard with full CRUD + affiliate links
+    └── index.astro              # Home page
