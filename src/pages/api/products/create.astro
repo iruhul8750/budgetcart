@@ -1,6 +1,6 @@
 ---
 // src/pages/api/products/create.astro
-// API endpoint for creating products
+// ✅ API endpoint – no URL hardcoding needed
 export const prerender = false;
 
 import fs from 'fs/promises';
@@ -11,15 +11,12 @@ export async function POST({ request }) {
     const body = await request.json();
     const { title, price, category, affiliateLink, platform, image, rating, description, body: content, pros, cons } = body;
     
-    // Validate required fields
     if (!title || !price || !category || !affiliateLink || !description || !content) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400 });
     }
     
-    // Generate slug from title
     const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     
-    // Build frontmatter
     const frontmatter = {
       title,
       price,
@@ -34,7 +31,6 @@ export async function POST({ request }) {
       pubDate: new Date().toISOString().split('T')[0]
     };
     
-    // Build markdown content
     let mdContent = '---\n';
     for (const [key, value] of Object.entries(frontmatter)) {
       if (value === undefined || value === null) continue;
@@ -52,7 +48,6 @@ export async function POST({ request }) {
     mdContent += '---\n\n';
     mdContent += content;
     
-    // Save to file
     const filePath = path.join(process.cwd(), 'src', 'content', 'products', `${slug}.md`);
     await fs.writeFile(filePath, mdContent, 'utf-8');
     

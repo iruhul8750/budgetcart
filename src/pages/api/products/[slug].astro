@@ -1,6 +1,6 @@
 ---
 // src/pages/api/products/[slug].astro
-// API endpoint for deleting products
+// ✅ API endpoint – no URL hardcoding needed
 export const prerender = false;
 
 import fs from 'fs/promises';
@@ -15,14 +15,12 @@ export async function DELETE({ params }) {
     
     const filePath = path.join(process.cwd(), 'src', 'content', 'products', `${slug}.md`);
     
-    // Check if file exists
     try {
       await fs.access(filePath);
     } catch {
       return new Response(JSON.stringify({ error: 'Product not found' }), { status: 404 });
     }
     
-    // Delete the file
     await fs.unlink(filePath);
     
     return new Response(JSON.stringify({ success: true }), { status: 200 });

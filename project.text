@@ -41,3 +41,17 @@ budgetcart/
 ├── .env.example                    # Environment variables
 ├── .gitignore                      # Git ignore file
 └── README.md                       # Project documentation
+
+
+IMP Commands
+npx wrangler dev --port 8787 --env local
+
+# 2. Delete build cache and output
+Remove-Item -Recurse -Force .astro -ErrorAction SilentlyContinue
+Remove-Item -Recurse -Force dist -ErrorAction SilentlyContinue
+
+worker redirect url
+const redirectUri =`http://127.0.0.1:8787/auth/callback`;
+
+Worker deploy on cloudflare 
+npx wrangler deploy --env production

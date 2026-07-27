@@ -1,7 +1,6 @@
 ---
 // src/pages/admin.astro
-// ✅ Uses SITE_URL from .env (local) or Render env (production)
-const SITE_URL = import.meta.env.SITE_URL || 'https://budget-cart.onrender.com';
+const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:10000';
 const isLocal = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1');
 const WORKER_URL = isLocal 
   ? 'http://127.0.0.1:8787' 
@@ -12,6 +11,9 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BudgetCart Admin</title>
@@ -65,6 +67,17 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
       color: #4b5563;
       display: inline-block;
     }
+    .debug {
+      margin-top: 16px;
+      padding: 12px;
+      background: #fef3c7;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #92400e;
+      word-break: break-all;
+      display: block;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -77,6 +90,7 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
     </button>
     <div id="status" class="status loading">⏳ Ready to login...</div>
     <div class="env-badge" id="envBadge">🌐 Environment: Loading...</div>
+    <div class="debug" id="debugInfo"></div>
   </div>
 
   <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
@@ -84,13 +98,10 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
     console.log('🔧 WORKER_URL:', WORKER_URL);
     console.log('📊 DASHBOARD_URL:', DASHBOARD_URL);
     
-    const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
-    document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
-    
-    const loginBtn = document.getElementById('loginBtn');
+    const debug = document.getElementById('debugInfo');
     const status = document.getElementById('status');
+    const loginBtn = document.getElementById('loginBtn');
 
-    // ✅ Function to get cookie value
     function getCookie(name) {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
@@ -98,8 +109,37 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
       return null;
     }
 
-    // ✅ Check for token in localStorage OR cookie
-    let token = localStorage.getItem('github_token');
+    // ✅ Check token from URL parameter first (from worker redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get('token');
+    
+    debug.innerHTML = `
+      🔍 Debug Info:<br>
+      URL: ${window.location.href}<br>
+      Token from URL: ${token ? '✅ Found' : '❌ Not found'}<br>
+      Token from localStorage: ${localStorage.getItem('github_token') ? '✅ Found' : '❌ Not found'}<br>
+      Token from cookie: ${getCookie('github_token') ? '✅ Found' : '❌ Not found'}<br>
+      WORKER_URL: ${WORKER_URL}<br>
+      SITE_URL: ${SITE_URL}<br>
+      DASHBOARD_URL: ${DASHBOARD_URL}
+    `;
+
+    if (token) {
+      // ✅ Store token from URL
+      localStorage.setItem('github_token', token);
+      document.cookie = 'github_token=' + token + '; path=/; max-age=3600; SameSite=Lax';
+      debug.innerHTML += `<br>✅ Token stored from URL parameter. Redirecting to dashboard...`;
+      status.textContent = '⏳ Redirecting to dashboard...';
+      setTimeout(() => {
+        window.location.href = DASHBOARD_URL;
+      }, 500);
+      return;
+    }
+
+    // ✅ If no token in URL, check localStorage or cookie
+    if (!token) {
+      token = localStorage.getItem('github_token');
+    }
     if (!token) {
       token = getCookie('github_token');
       if (token) {
@@ -109,25 +149,28 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
 
     // ✅ If token exists, redirect to dashboard
     if (token) {
+      debug.innerHTML += `<br>✅ Token found in localStorage/cookie. Redirecting to dashboard...`;
       status.className = 'status success';
-      status.textContent = '✅ Already logged in! Redirecting to dashboard...';
+      status.textContent = '✅ Logged in! Redirecting to dashboard...';
       loginBtn.disabled = true;
       loginBtn.style.opacity = '0.5';
       setTimeout(() => {
         window.location.href = DASHBOARD_URL;
-      }, 1000);
+      }, 500);
       return;
     }
 
-    // ✅ Check for code from GitHub callback
-    const urlParams = new URLSearchParams(window.location.search);
+    // ✅ Check for code from GitHub callback (fallback)
     const code = urlParams.get('code');
     if (code) {
-      status.className = 'status loading';
+      debug.innerHTML += `<br>⏳ Code found in URL. Redirecting to worker callback...`;
       status.textContent = '⏳ Completing authentication...';
       window.location.href = WORKER_URL + '/auth/callback?code=' + code;
       return;
     }
+
+    const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
+    document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
 
     loginBtn.addEventListener('click', function() {
       status.className = 'status loading';

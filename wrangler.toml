@@ -2,8 +2,24 @@ name = "budgetcart-oauth-proxy"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
-[env.local]
+# ✅ Top-level vars (default for deploy without --env)
 [vars]
 GITHUB_CLIENT_ID = "Ov23lixkEagiMqMJRgsh"
 GITHUB_CLIENT_SECRET = "c50e16aef4bf3e79e1c63c894523d59bf047010b"
 SITE_URL = "http://localhost:10000"
+
+# ✅ Local environment (for wrangler dev)
+[env.local]
+
+GITHUB_CLIENT_ID = "Ov23lixkEagiMqMJRgsh"
+GITHUB_CLIENT_SECRET = "c50e16aef4bf3e79e1c63c894523d59bf047010b"
+SITE_URL = "http://localhost:10000"
+
+
+
+# ✅ Production environment (for wrangler deploy --env production)
+[env.production]
+
+GITHUB_CLIENT_ID = "Ov23lixkEagiMqMJRgsh"
+GITHUB_CLIENT_SECRET = "c50e16aef4bf3e79e1c63c894523d59bf047010b"
+SITE_URL = "https://budget-cart.onrender.com"

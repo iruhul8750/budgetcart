@@ -1,6 +1,7 @@
 ---
 // src/pages/admin/edit/[slug].astro
-// Edit product page
+// ✅ Uses SITE_URL from environment
+const SITE_URL = import.meta.env.SITE_URL || 'https://budget-cart.onrender.com';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -176,7 +177,7 @@ const slug = product?.slug;
     </div>
   </div>
 
-  <script>
+  <script define:vars={{ SITE_URL }}>
     document.getElementById('editForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.target;
@@ -204,7 +205,7 @@ const slug = product?.slug;
         if (res.ok) {
           status.textContent = '✅ Product updated successfully! Redirecting...';
           status.style.color = '#16a34a';
-          setTimeout(() => window.location.href = '/admin/dashboard', 1500);
+          setTimeout(() => window.location.href = SITE_URL + '/admin/dashboard', 1500);
         } else {
           status.textContent = '❌ Error: ' + (result.error || 'Unknown error');
           status.style.color = '#dc2626';

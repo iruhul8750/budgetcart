@@ -1,11 +1,10 @@
-// worker.js – GitHub OAuth Proxy
-// ✅ Uses SITE_URL from environment (Cloudflare Worker env)
+// worker.js – GitHub OAuth Proxy with token passing
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const CLIENT_ID = env.GITHUB_CLIENT_ID;
     const CLIENT_SECRET = env.GITHUB_CLIENT_SECRET;
-    const SITE_URL = env.SITE_URL || 'https://budget-cart.onrender.com';
+    const SITE_URL = env.SITE_URL || 'http://localhost:10000';
 
     if (!CLIENT_ID || !CLIENT_SECRET) {
       return new Response("Missing GITHUB_CLIENT_ID or GITHUB_CLIENT_SECRET in environment", {
@@ -26,7 +25,7 @@ export default {
       return Response.redirect(githubAuthUrl, 302);
     }
 
-    // --- /auth/callback — exchange code for token and redirect to SITE_URL/admin ---
+    // --- /auth/callback — exchange code for token and redirect to admin with token ---
     if (url.pathname === "/auth/callback") {
       const code = url.searchParams.get("code");
       if (!code) {
@@ -58,68 +57,10 @@ export default {
 
         const accessToken = tokenData.access_token;
 
-        // ✅ Redirect to SITE_URL/admin (from env)
-        const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Authentication complete</title>
-  <meta charset="utf-8">
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-      max-width: 400px;
-    }
-    .spinner {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #2563eb;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px 0;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .success { color: #16a34a; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🛒 BudgetCart</h1>
-    <div class="spinner"></div>
-    <p>Authentication successful!</p>
-    <p class="success">✅ Redirecting to admin dashboard...</p>
-  </div>
-  <script>
-    const token = '${accessToken}';
-    localStorage.setItem('github_token', token);
-    document.cookie = 'github_token=' + token + '; path=/; max-age=3600; SameSite=Lax';
-    // ✅ Redirect to SITE_URL/admin (from env)
-    window.location.href = '${SITE_URL}/admin';
-  </script>
-</body>
-</html>`;
-
-        return new Response(html, {
-          headers: { "Content-Type": "text/html" },
-        });
+        // ✅ Use HTTP redirect with token in URL instead of HTML redirect
+        // This ensures the token appears in the URL
+        const redirectUrl = `${SITE_URL}/admin?token=${accessToken}`;
+        return Response.redirect(redirectUrl, 302);
 
       } catch (err) {
         return new Response(`Server error: ${err.message}`, {
@@ -127,11 +68,6 @@ export default {
           headers: { "Content-Type": "text/plain" },
         });
       }
-    }
-
-    // --- /admin — redirect to SITE_URL/admin ---
-    if (url.pathname === "/admin") {
-      return Response.redirect(`${SITE_URL}/admin`, 302);
     }
 
     // --- Root ---
