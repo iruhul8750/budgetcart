@@ -2,9 +2,9 @@
 // src/pages/admin/dashboard.astro
 import { getCollection } from 'astro:content';
 
-const SITE_URL = import.meta.env.SITE_URL;
-const GITHUB_REPO = import.meta.env.GITHUB_REPO;
-const GITHUB_BRANCH = import.meta.env.GITHUB_BRANCH || 'main';
+const SITE_URL = import.meta.env.SITE_URL || 'https://budget-cart.onrender.com';
+const GITHUB_REPO = import.meta.env.GITHUB_REPO || 'your-username/your-repo';
+const GITHUB_BRANCH = import.meta.env.GITHUB_BRANCH || 'dev';
 
 // Fetch products from content collection
 let products = [];
@@ -20,9 +20,8 @@ try {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BudgetCart - Dashboard</title>
+  <title>BudgetCart Dashboard</title>
   <style>
-    /* ===== RESET & BASE ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { 
       font-family: system-ui, -apple-system, sans-serif; 
@@ -31,8 +30,7 @@ try {
     }
     .dashboard-container { max-width: 1200px; margin: 0 auto; }
     
-    /* ===== HEADER ===== */
-    .dashboard-header {
+    header {
       background: white;
       padding: 16px 24px;
       border-radius: 12px;
@@ -44,7 +42,7 @@ try {
       flex-wrap: wrap;
       gap: 12px;
     }
-    .dashboard-header h1 { font-size: 1.3rem; }
+    header h1 { font-size: 1.3rem; }
     .header-actions {
       display: flex;
       gap: 12px;
@@ -52,7 +50,6 @@ try {
       flex-wrap: wrap;
     }
     
-    /* ===== BUTTONS ===== */
     .btn {
       padding: 8px 16px;
       border: none;
@@ -74,13 +71,6 @@ try {
     .btn-secondary:hover { background: #4b5563; }
     .btn-success { background: #16a34a; color: white; }
     .btn-success:hover { background: #15803d; }
-    .btn-close { 
-      background: transparent; 
-      color: #6b7280; 
-      border: 1px solid #d1d5db;
-      padding: 8px 16px;
-    }
-    .btn-close:hover { background: #f3f4f6; }
     .btn-logout { 
       padding: 8px 16px; 
       background: #dc2626; 
@@ -92,7 +82,6 @@ try {
     }
     .btn-logout:hover { background: #b91c1c; }
     
-    /* ===== STATS ===== */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -115,7 +104,6 @@ try {
       color: #6b7280; 
     }
     
-    /* ===== CARDS ===== */
     .card { 
       background: white; 
       padding: 20px 24px; 
@@ -123,11 +111,9 @@ try {
       box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
       margin-bottom: 16px; 
     }
-    
-    /* ===== PRODUCT GRID ===== */
     .product-grid { 
       display: grid; 
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
       gap: 16px; 
     }
     .product-card {
@@ -143,7 +129,6 @@ try {
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     
-    /* ===== BADGES ===== */
     .badge {
       position: absolute;
       top: 8px;
@@ -169,7 +154,7 @@ try {
       font-weight: bold; 
       font-size: 1.1rem;
     }
-    .product-card .original-price {
+    .product-card .compare-price {
       color: #9ca3af;
       text-decoration: line-through;
       font-size: 0.85rem;
@@ -256,7 +241,6 @@ try {
       margin-bottom: 8px; 
     }
     
-    /* ===== LOADING ===== */
     #loadingOverlay {
       position: fixed;
       top: 0;
@@ -284,7 +268,6 @@ try {
       100% { transform: rotate(360deg); }
     }
     
-    /* ===== MODALS ===== */
     .modal {
       display: none;
       position: fixed;
@@ -302,37 +285,12 @@ try {
       background: white;
       padding: 24px;
       border-radius: 12px;
-      max-width: 650px;
+      max-width: 600px;
       width: 90%;
       max-height: 90vh;
       overflow-y: auto;
-      position: relative;
     }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-    .modal-header h2 { 
-      font-size: 1.3rem;
-      margin: 0;
-    }
-    .modal-close-btn {
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #6b7280;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: all 0.2s;
-      line-height: 1;
-    }
-    .modal-close-btn:hover {
-      background: #f3f4f6;
-      color: #1f2937;
-    }
+    .modal-content h2 { margin-bottom: 16px; }
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -346,23 +304,6 @@ try {
       margin-bottom: 4px;
       font-weight: 600;
       font-size: 0.9rem;
-    }
-    .form-group label .required {
-      color: #dc2626;
-    }
-    .form-group .currency-symbol {
-      position: relative;
-    }
-    .form-group .currency-symbol input {
-      padding-left: 28px;
-    }
-    .form-group .currency-symbol .symbol {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-weight: 600;
-      color: #6b7280;
     }
     .form-group input,
     .form-group textarea,
@@ -388,10 +329,7 @@ try {
       gap: 8px;
       margin-top: 16px;
     }
-    .form-actions .btn { 
-      flex: 1; 
-      justify-content: center;
-    }
+    .form-actions .btn { flex: 1; }
     .form-group .checkbox-group {
       display: flex;
       gap: 16px;
@@ -410,7 +348,6 @@ try {
       margin-right: 4px;
     }
     
-    /* ===== TOAST ===== */
     .toast {
       position: fixed;
       bottom: 20px;
@@ -430,9 +367,8 @@ try {
       to { transform: translateY(0); opacity: 1; }
     }
     
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 640px) {
-      .dashboard-header { flex-direction: column; align-items: stretch; }
+      header { flex-direction: column; align-items: stretch; }
       .header-actions { flex-direction: column; }
       .header-actions .btn,
       .header-actions .btn-logout { width: 100%; }
@@ -450,7 +386,7 @@ try {
 
   <!-- Main Content -->
   <div class="dashboard-container" id="mainContent" style="display: none;">
-    <header class="dashboard-header">
+    <header>
       <h1>🛒 BudgetCart Dashboard</h1>
       <div class="header-actions">
         <span id="userEmail" style="color: #6b7280; font-size: 0.9rem;"></span>
@@ -459,7 +395,6 @@ try {
       </div>
     </header>
 
-    <!-- Stats -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="number">{products.length}</div>
@@ -488,7 +423,6 @@ try {
       <p style="color: #6b7280; margin-top: 4px; font-size: 0.9rem;">Manage your ecommerce products with affiliate links</p>
     </div>
 
-    <!-- Products Grid -->
     <div id="productsContainer">
       {products.length > 0 ? (
         <div class="product-grid">
@@ -515,7 +449,7 @@ try {
                 <div>
                   <span class="price">₹{data?.price || '0'}</span>
                   {data?.originalPrice && data.originalPrice !== data.price && (
-                    <span class="original-price">₹{data.originalPrice}</span>
+                    <span class="compare-price">₹{data.originalPrice}</span>
                   )}
                 </div>
                 <span class="category">{data?.category || 'Uncategorized'}</span>
@@ -566,17 +500,13 @@ try {
     </div>
   </div>
 
-  <!-- ===== PRODUCT MODAL ===== -->
+  <!-- Product Modal -->
   <div class="modal" id="productModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Add Product</h2>
-        <button type="button" class="modal-close-btn" id="closeModalBtn">✕</button>
-      </div>
+      <h2 id="modalTitle">Add Product</h2>
       <form id="productForm">
         <input type="hidden" id="productId" />
         
-        <!-- Basic Info -->
         <div class="form-group">
           <label>Product Title <span class="required">*</span></label>
           <input type="text" id="productTitle" required placeholder="Product name" />
@@ -585,19 +515,11 @@ try {
         <div class="form-row">
           <div class="form-group">
             <label>Sale Price (₹) <span class="required">*</span></label>
-            <div class="currency-symbol">
-              <span class="symbol">₹</span>
-              <input type="text" id="productPrice" required placeholder="499" />
-            </div>
-            <div class="hint">Current selling price</div>
+            <input type="text" id="productPrice" required placeholder="499" />
           </div>
           <div class="form-group">
             <label>Original Price (₹)</label>
-            <div class="currency-symbol">
-              <span class="symbol">₹</span>
-              <input type="text" id="productOriginalPrice" placeholder="999" />
-            </div>
-            <div class="hint">Original/MRP price (shown with line-through)</div>
+            <input type="text" id="productOriginalPrice" placeholder="999" />
           </div>
         </div>
         
@@ -624,7 +546,6 @@ try {
           </div>
         </div>
         
-        <!-- Affiliate Info -->
         <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
           <label style="font-size: 1rem; color: #8b5cf6;">🔗 Affiliate Information</label>
         </div>
@@ -655,7 +576,6 @@ try {
           <div class="hint">Enable this to display the affiliate link on the product page</div>
         </div>
         
-        <!-- Inventory -->
         <div class="form-group" style="border-top: 1px solid #e5e7eb; padding-top: 16px;">
           <label style="font-size: 1rem;">📦 Inventory & Status</label>
         </div>
@@ -701,24 +621,21 @@ try {
         
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="saveProductBtn">Save Product</button>
-          <button type="button" class="btn btn-close" id="cancelModalBtn">Cancel</button>
+          <button type="button" class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- ===== DELETE MODAL ===== -->
+  <!-- Delete Modal -->
   <div class="modal" id="deleteModal">
     <div class="modal-content">
-      <div class="modal-header">
-        <h2>Delete Product</h2>
-        <button type="button" class="modal-close-btn" id="closeDeleteModalBtn">✕</button>
-      </div>
+      <h2>Delete Product</h2>
       <p>Are you sure you want to delete "<span id="deleteProductName"></span>"?</p>
       <p style="color: #6b7280; font-size: 0.9rem; margin-top: 8px;">This action cannot be undone.</p>
       <div class="form-actions">
         <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
-        <button class="btn btn-close" id="cancelDeleteBtn">Cancel</button>
+        <button class="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
       </div>
     </div>
   </div>
@@ -729,7 +646,7 @@ try {
     console.log('🌿 GITHUB_BRANCH:', GITHUB_BRANCH);
     
     // ============================================
-    // AUTHENTICATION CHECK
+    // SIMPLIFIED AUTHENTICATION - NO VERIFICATION CALL
     // ============================================
     
     const loadingOverlay = document.getElementById('loadingOverlay');
@@ -759,12 +676,12 @@ try {
       return;
     }
     
-    // Token exists - hide loading and show dashboard
+    // Token exists - hide loading and show dashboard IMMEDIATELY
     console.log('✅ Token found, loading dashboard...');
     loadingOverlay.classList.add('hidden');
     mainContent.style.display = 'block';
     
-    // Get user info (optional, for display)
+    // Get user info (optional, for display) - DON'T block loading
     async function getUserInfo() {
       try {
         const response = await fetch('https://api.github.com/user', {
@@ -774,9 +691,16 @@ try {
           const data = await response.json();
           document.getElementById('userEmail').textContent = data.login || 'User';
           console.log('✅ User:', data.login);
+        } else {
+          // If token is invalid, redirect to login
+          if (response.status === 401) {
+            localStorage.removeItem('github_token');
+            window.location.href = SITE_URL + '/admin/login';
+          }
         }
       } catch (error) {
         console.warn('⚠️ Could not fetch user info:', error);
+        // Don't redirect - just show dashboard without user info
       }
     }
     getUserInfo();
@@ -811,7 +735,6 @@ try {
         .replace(/^-+|-+$/g, '');
     }
 
-    // Save product to GitHub
     async function saveProductToGitHub(filePath, markdown, sha = null) {
       const url = `https://api.github.com/repos/${REPO}/contents/${filePath}`;
       
@@ -838,7 +761,6 @@ try {
       return response;
     }
 
-    // Delete product from GitHub
     async function deleteProductFromGitHub(filePath, sha) {
       const url = `https://api.github.com/repos/${REPO}/contents/${filePath}`;
       
@@ -929,14 +851,12 @@ try {
 
       const slug = generateSlug(title);
       
-      // Build markdown with all fields
       let markdown = '---\n';
       markdown += `title: "${title}"\n`;
       markdown += `price: "${price}"\n`;
       if (originalPrice) markdown += `originalPrice: "${originalPrice}"\n`;
       markdown += `category: "${category || 'Uncategorized'}"\n`;
       
-      // Affiliate fields
       if (affiliateLink) markdown += `affiliateLink: "${affiliateLink}"\n`;
       if (affiliateNetwork) markdown += `affiliateNetwork: "${affiliateNetwork}"\n`;
       if (commission) markdown += `commission: "${commission}"\n`;
@@ -959,7 +879,6 @@ try {
       try {
         let sha = null;
         
-        // If editing, get existing file SHA
         if (id || currentProductId) {
           const checkId = id || currentProductId;
           try {
@@ -1002,7 +921,6 @@ try {
       try {
         const filePath = `src/content/products/${id}.md`;
         
-        // Get file SHA first
         const getResponse = await fetch(
           `https://api.github.com/repos/${REPO}/contents/${filePath}`,
           {
@@ -1040,20 +958,12 @@ try {
     // EVENT LISTENERS
     // ============================================
 
-    // Modal close buttons
-    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-    document.getElementById('closeDeleteModalBtn').addEventListener('click', closeModal);
-    document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
-    document.getElementById('cancelDeleteBtn').addEventListener('click', closeModal);
-
-    // Add product buttons
     document.getElementById('addProductBtn').addEventListener('click', () => openModal(null));
     document.getElementById('emptyAddBtn')?.addEventListener('click', () => openModal(null));
-    
-    // Form submit
+    document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+    document.getElementById('cancelDeleteBtn').addEventListener('click', closeModal);
     document.getElementById('productForm').addEventListener('submit', saveProduct);
 
-    // Edit buttons
     document.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = e.target.dataset.id;
@@ -1067,7 +977,7 @@ try {
           data: {
             title: card.querySelector('h3')?.textContent || '',
             price: card.querySelector('.price')?.textContent?.replace('₹', '') || '',
-            originalPrice: card.querySelector('.original-price')?.textContent?.replace('₹', '') || '',
+            originalPrice: card.querySelector('.compare-price')?.textContent?.replace('₹', '') || '',
             category: card.querySelector('.category')?.textContent || '',
             sku: card.querySelector('.sku')?.textContent?.replace('SKU: ', '') || '',
             rating: parseFloat(card.querySelector('[data-rating]')?.textContent?.replace('⭐ ', '') || '0'),
@@ -1088,7 +998,6 @@ try {
       });
     });
 
-    // Delete buttons
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const id = e.target.dataset.id;
@@ -1099,12 +1008,18 @@ try {
       });
     });
 
-    // Confirm delete
     document.getElementById('confirmDeleteBtn').addEventListener('click', (e) => {
       deleteProduct(e.target.dataset.id);
     });
 
-    // Close modals with Escape key (not clicking overlay)
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    });
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeModal();
