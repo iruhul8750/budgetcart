@@ -154,7 +154,7 @@ try {
       font-weight: bold; 
       font-size: 1.1rem;
     }
-    .product-card .compare-price {
+    .product-card .original-price {
       color: #9ca3af;
       text-decoration: line-through;
       font-size: 0.85rem;
@@ -378,14 +378,14 @@ try {
   </style>
 </head>
 <body>
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay">
+  <!-- Loading Overlay - Hidden by default, will show if needed -->
+  <div id="loadingOverlay" class="hidden">
     <div class="spinner"></div>
-    <p style="margin-top: 16px; color: #6b7280;">Verifying authentication...</p>
+    <p style="margin-top: 16px; color: #6b7280;">Loading...</p>
   </div>
 
   <!-- Main Content -->
-  <div class="dashboard-container" id="mainContent" style="display: none;">
+  <div class="dashboard-container" id="mainContent">
     <header>
       <h1>🛒 BudgetCart Dashboard</h1>
       <div class="header-actions">
@@ -449,7 +449,7 @@ try {
                 <div>
                   <span class="price">₹{data?.price || '0'}</span>
                   {data?.originalPrice && data.originalPrice !== data.price && (
-                    <span class="compare-price">₹{data.originalPrice}</span>
+                    <span class="original-price">₹{data.originalPrice}</span>
                   )}
                 </div>
                 <span class="category">{data?.category || 'Uncategorized'}</span>
@@ -646,66 +646,64 @@ try {
     console.log('🌿 GITHUB_BRANCH:', GITHUB_BRANCH);
     
     // ============================================
-    // SIMPLIFIED AUTHENTICATION - NO VERIFICATION CALL
+    // IMMEDIATE AUTHENTICATION CHECK - NO WAITING
     // ============================================
     
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    const mainContent = document.getElementById('mainContent');
-    
-    // Check for token in URL first (from worker redirect)
+    // Get token from URL (from worker redirect)
     const urlParams = new URLSearchParams(window.location.search);
     let token = urlParams.get('token');
     
     if (token) {
       console.log('✅ Token found in URL, storing...');
       localStorage.setItem('github_token', token);
-      // Remove token from URL
+      // Remove token from URL without page reload
       const newUrl = window.location.pathname;
       window.history.replaceState({}, document.title, newUrl);
+      console.log('📝 Token stored, URL cleaned');
     } else {
+      // Check localStorage
       token = localStorage.getItem('github_token');
       if (token) {
         console.log('✅ Token found in localStorage');
+      } else {
+        console.log('❌ No token found, redirecting to login...');
+        window.location.href = SITE_URL + '/admin/login';
+        return; // Stop execution
       }
     }
     
-    // If no token, redirect to login page
-    if (!token) {
-      console.log('❌ No token found, redirecting to login...');
-      window.location.href = SITE_URL + '/admin/login';
-      return;
-    }
-    
-    // Token exists - hide loading and show dashboard IMMEDIATELY
+    // Token exists - show dashboard IMMEDIATELY
     console.log('✅ Token found, loading dashboard...');
-    loadingOverlay.classList.add('hidden');
-    mainContent.style.display = 'block';
     
-    // Get user info (optional, for display) - DON'T block loading
+    // Get user info (optional, non-blocking)
     async function getUserInfo() {
       try {
+        console.log('🔍 Fetching user info from GitHub...');
         const response = await fetch('https://api.github.com/user', {
           headers: { 'Authorization': `token ${token}` }
         });
         if (response.ok) {
           const data = await response.json();
           document.getElementById('userEmail').textContent = data.login || 'User';
-          console.log('✅ User:', data.login);
+          console.log('✅ User info loaded:', data.login);
+        } else if (response.status === 401) {
+          // Token is invalid, redirect to login
+          console.warn('⚠️ Invalid token, redirecting to login...');
+          localStorage.removeItem('github_token');
+          window.location.href = SITE_URL + '/admin/login';
         } else {
-          // If token is invalid, redirect to login
-          if (response.status === 401) {
-            localStorage.removeItem('github_token');
-            window.location.href = SITE_URL + '/admin/login';
-          }
+          console.warn('⚠️ GitHub API error:', response.status);
         }
       } catch (error) {
-        console.warn('⚠️ Could not fetch user info:', error);
+        console.warn('⚠️ Could not fetch user info:', error.message);
         // Don't redirect - just show dashboard without user info
       }
     }
-    getUserInfo();
     
-    // Logout - redirect to login page
+    // Show dashboard immediately
+    getUserInfo(); // Run in background
+    
+    // Logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
       localStorage.removeItem('github_token');
       window.location.href = SITE_URL + '/admin/login';
@@ -977,7 +975,7 @@ try {
           data: {
             title: card.querySelector('h3')?.textContent || '',
             price: card.querySelector('.price')?.textContent?.replace('₹', '') || '',
-            originalPrice: card.querySelector('.compare-price')?.textContent?.replace('₹', '') || '',
+            originalPrice: card.querySelector('.original-price')?.textContent?.replace('₹', '') || '',
             category: card.querySelector('.category')?.textContent || '',
             sku: card.querySelector('.sku')?.textContent?.replace('SKU: ', '') || '',
             rating: parseFloat(card.querySelector('[data-rating]')?.textContent?.replace('⭐ ', '') || '0'),
