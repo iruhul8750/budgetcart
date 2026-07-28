@@ -1,8 +1,11 @@
 ---
 // src/pages/admin/login.astro
-const SITE_URL = import.meta.env.SITE_URL;
-const WORKER_URL = import.meta.env.WORKER_URL;
+const SITE_URL = import.meta.env.SITE_URL || 'http://localhost:10000';
+const WORKER_URL = import.meta.env.WORKER_URL || 'http://127.0.0.1:8787';
 const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
+
+const isDev = SITE_URL.includes('localhost') || SITE_URL.includes('127.0.0.1');
+const envLabel = isDev ? '🔧 Local Development' : '🚀 Production';
 ---
 
 <!DOCTYPE html>
@@ -13,7 +16,7 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
   <meta http-equiv="Expires" content="0" />
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BudgetCart - Admin Login</title>
+  <title>BudgetCart Admin</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -60,11 +63,19 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
     }
     .login-btn:hover { background: #1b1f23; }
     .login-btn svg { width: 20px; height: 20px; fill: white; }
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
     .status {
       margin-top: 16px;
       padding: 12px;
       border-radius: 6px;
       font-size: 0.9rem;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .status-loading { color: #6b7280; background: #f3f4f6; }
     .status-success { color: #16a34a; background: #f0fdf4; }
@@ -91,17 +102,15 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
       Login with GitHub
     </button>
     <div id="status" class="status status-loading">⏳ Ready to login...</div>
-    <div class="env-badge" id="envBadge">🌐 Environment: Loading...</div>
+    <div class="env-badge" id="envBadge">{envLabel}</div>
   </div>
 
-  <script define:vars={{ WORKER_URL, SITE_URL, DASHBOARD_URL }}>
-    console.log('🌐 SITE_URL:', SITE_URL);
-    console.log('🔧 WORKER_URL:', WORKER_URL);
-    console.log('📊 DASHBOARD_URL:', DASHBOARD_URL);
+  <script define:vars={{ SITE_URL, WORKER_URL, DASHBOARD_URL }}>
+    const AUTH_URL = WORKER_URL + '/auth';
     
     const status = document.getElementById('status');
     const loginBtn = document.getElementById('loginBtn');
-
+    
     // Check if user is already logged in
     const token = localStorage.getItem('github_token');
     if (token) {
@@ -109,17 +118,47 @@ const DASHBOARD_URL = `${SITE_URL}/admin/dashboard`;
       status.textContent = '✅ Already logged in! Redirecting...';
       loginBtn.disabled = true;
       loginBtn.style.opacity = '0.5';
-      window.location.href = DASHBOARD_URL;
-      return;
+      
+      setTimeout(() => {
+        window.location.href = DASHBOARD_URL;
+      }, 500);
+    } else {
+      // Validate URLs
+      if (!SITE_URL || SITE_URL === 'undefined') {
+        status.className = 'status status-error';
+        status.textContent = '❌ Error: SITE_URL is not configured';
+        loginBtn.disabled = true;
+      }
+
+      if (!WORKER_URL || WORKER_URL === 'undefined') {
+        status.className = 'status status-error';
+        status.textContent = '❌ Error: WORKER_URL is not configured';
+        loginBtn.disabled = true;
+      }
+
+      const isDev = WORKER_URL && (WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1'));
+      document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
+
+      if (SITE_URL && SITE_URL !== 'undefined' && WORKER_URL && WORKER_URL !== 'undefined') {
+        loginBtn.disabled = false;
+        loginBtn.style.opacity = '1';
+        status.className = 'status status-loading';
+        status.textContent = '⏳ Ready to login...';
+      }
     }
 
-    const isDev = WORKER_URL.includes('localhost') || WORKER_URL.includes('127.0.0.1');
-    document.getElementById('envBadge').textContent = isDev ? '🔧 Local Development' : '🚀 Production';
-
     loginBtn.addEventListener('click', function() {
+      if (!WORKER_URL || WORKER_URL === 'undefined') {
+        status.className = 'status status-error';
+        status.textContent = '❌ Error: WORKER_URL is not configured';
+        return;
+      }
+      
       status.className = 'status status-loading';
       status.textContent = '⏳ Redirecting to GitHub...';
-      window.location.href = WORKER_URL + '/auth';
+      loginBtn.disabled = true;
+      
+      window.location.href = AUTH_URL;
     });
   </script>
 </body>
