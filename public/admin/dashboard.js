@@ -17,10 +17,112 @@
   const BRANCH = initialData.githubBranch || 'dev';
   const ALL_CATEGORIES = initialData.categories || [];
 
+  // Session Configuration
+  const SESSION_CONFIG = {
+    // Session timeout in milliseconds (30 minutes)
+    TIMEOUT: 30 * 60 * 1000,
+    // Check interval in milliseconds (1 minute)
+    CHECK_INTERVAL: 60 * 1000,
+    // Warning before timeout in milliseconds (5 minutes)
+    WARNING_TIME: 5 * 60 * 1000,
+  };
+
   // State
   let token = localStorage.getItem('github_token');
   let currentProductId = null;
   let isLoading = false;
+  let sessionTimer = null;
+  let sessionCheckInterval = null;
+  let warningShown = false;
+
+  // ============================================
+  // SESSION MANAGEMENT
+  // ============================================
+
+  function getSessionStartTime() {
+    return parseInt(localStorage.getItem('session_start_time') || Date.now().toString());
+  }
+
+  function updateSessionStartTime() {
+    localStorage.setItem('session_start_time', Date.now().toString());
+  }
+
+  function getRemainingTime() {
+    const startTime = getSessionStartTime();
+    const elapsed = Date.now() - startTime;
+    return Math.max(0, SESSION_CONFIG.TIMEOUT - elapsed);
+  }
+
+  function resetSessionTimer() {
+    // Reset the session timer
+    updateSessionStartTime();
+    warningShown = false;
+    
+    // Clear existing timers
+    clearTimeout(sessionTimer);
+    clearInterval(sessionCheckInterval);
+    
+    // Start new session check
+    startSessionMonitoring();
+  }
+
+  function startSessionMonitoring() {
+    // Check session every minute
+    sessionCheckInterval = setInterval(() => {
+      const remaining = getRemainingTime();
+      
+      if (remaining <= 0) {
+        // Session expired
+        handleSessionExpired();
+        return;
+      }
+      
+      // Show warning when 5 minutes remaining
+      if (remaining <= SESSION_CONFIG.WARNING_TIME && !warningShown) {
+        warningShown = true;
+        showToast('⚠️ Your session will expire in 5 minutes. Please save your work.', 'warning', 10000);
+      }
+    }, SESSION_CONFIG.CHECK_INTERVAL);
+
+    // Set a timer for session expiry
+    sessionTimer = setTimeout(() => {
+      handleSessionExpired();
+    }, SESSION_CONFIG.TIMEOUT);
+  }
+
+  function handleSessionExpired() {
+    clearInterval(sessionCheckInterval);
+    clearTimeout(sessionTimer);
+    
+    showToast('🔒 Your session has expired. Please login again.', 'error', 5000);
+    
+    // Wait a moment then logout
+    setTimeout(() => {
+      logoutUser('Session expired. Please login again.');
+    }, 1500);
+  }
+
+  function logoutUser(message = 'Logged out successfully.') {
+    // Clear all session data
+    localStorage.removeItem('github_token');
+    localStorage.removeItem('session_start_time');
+    localStorage.removeItem('user_data');
+    
+    // Clear timers
+    clearInterval(sessionCheckInterval);
+    clearTimeout(sessionTimer);
+    
+    // Redirect to login page
+    window.location.href = `${SITE_URL}/admin/login?message=${encodeURIComponent(message)}`;
+  }
+
+  // Reset session on user activity
+  function resetSessionOnActivity() {
+    // Only reset if we have a valid token
+    if (token) {
+      resetSessionTimer();
+    }
+  }
 
   // ============================================
   // TOAST NOTIFICATIONS
@@ -115,15 +217,44 @@
   if (urlToken) {
     console.log('✅ Token found in URL, storing...');
     localStorage.setItem('github_token', urlToken);
+    updateSessionStartTime();
     const cleanUrl = window.location.origin + window.location.pathname;
     window.location.href = cleanUrl;
     return;
+  }
+
+  // Check for message parameter
+  const messageParam = urlParams.get('message');
+  if (messageParam) {
+    showToast(decodeURIComponent(messageParam), 'info', 5000);
   }
 
   if (!token) {
     console.log('❌ No token found, redirecting to login...');
     window.location.href = SITE_URL + '/admin/login';
     return;
+  }
+
+  // Validate token is still valid
+  async function validateToken() {
+    try {
+      const response = await fetch('https://api.github.com/user', {
+        headers: { 'Authorization': `token ${token}` }
+      });
+      
+      if (!response.ok) {
+        // Token is invalid or expired
+        localStorage.removeItem('github_token');
+        localStorage.removeItem('session_start_time');
+        window.location.href = `${SITE_URL}/admin/login?message=${encodeURIComponent('Session invalid. Please login again.')}`;
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return false;
+    }
   }
 
   console.log('✅ Token found, loading dashboard...');
@@ -140,22 +271,42 @@
         if (userEmail) {
           userEmail.textContent = data.login || 'User';
         }
+        // Store user data
+        localStorage.setItem('user_data', JSON.stringify(data));
         console.log('✅ User info loaded:', data.login);
+      } else {
+        // Token might be invalid
+        logoutUser('Session invalid. Please login again.');
       }
     } catch (error) {
       console.warn('Could not fetch user info:', error.message);
     }
   }
 
-  getUserInfo();
+  // Initialize session
+  async function initializeSession() {
+    // Validate token
+    const isValid = await validateToken();
+    if (!isValid) return;
 
-  // Logout
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
-      localStorage.removeItem('github_token');
-      window.location.href = SITE_URL + '/admin/login';
-    });
+    // Get user info
+    await getUserInfo();
+
+    // Initialize session timer
+    const startTime = getSessionStartTime();
+    const remaining = getRemainingTime();
+
+    if (remaining <= 0) {
+      // Session expired
+      handleSessionExpired();
+      return;
+    }
+
+    // Show session info in console
+    console.log(`⏱️ Session expires in ${Math.floor(remaining / 60000)} minutes`);
+    
+    // Start monitoring
+    startSessionMonitoring();
   }
 
   // ============================================
@@ -222,6 +373,11 @@
       body: JSON.stringify(body)
     });
     
+    // Reset session on successful API call
+    if (response.ok) {
+      resetSessionTimer();
+    }
+    
     return response;
   }
 
@@ -241,6 +397,11 @@
         branch: BRANCH
       })
     });
+    
+    // Reset session on successful API call
+    if (response.ok) {
+      resetSessionTimer();
+    }
     
     return response;
   }
@@ -283,6 +444,8 @@
     }
     
     modal.classList.add('active');
+    // Reset session on modal open
+    resetSessionTimer();
   }
 
   function closeModal() {
@@ -329,6 +492,13 @@
     event.preventDefault();
     
     if (isLoading) return;
+    
+    // Check session before saving
+    const remaining = getRemainingTime();
+    if (remaining <= 0) {
+      handleSessionExpired();
+      return;
+    }
     
     const id = document.getElementById('productId').value;
     const title = document.getElementById('productTitle').value.trim();
@@ -413,6 +583,10 @@
       } else {
         const error = await response.json();
         console.error('GitHub API Error:', error);
+        if (error.message === 'Bad credentials') {
+          logoutUser('Session expired. Please login again.');
+          return;
+        }
         showToast(`Error: ${error.message || 'Failed to save product'}`, 'error');
         hideLoader();
       }
@@ -431,6 +605,13 @@
 
   async function deleteProduct(id) {
     if (isLoading) return;
+    
+    // Check session before deleting
+    const remaining = getRemainingTime();
+    if (remaining <= 0) {
+      handleSessionExpired();
+      return;
+    }
     
     showLoader('Deleting product...');
     
@@ -463,6 +644,10 @@
         setTimeout(() => window.location.reload(), 1500);
       } else {
         const error = await response.json();
+        if (error.message === 'Bad credentials') {
+          logoutUser('Session expired. Please login again.');
+          return;
+        }
         showToast(`Error: ${error.message || 'Failed to delete product'}`, 'error');
         hideLoader();
       }
@@ -487,6 +672,9 @@
   }
 
   function initDashboard() {
+    // Initialize session
+    initializeSession();
+
     // Add Product buttons
     const addBtn = document.getElementById('addProductBtn');
     const emptyAddBtn = document.getElementById('emptyAddBtn');
@@ -514,6 +702,7 @@
       categoryFilter.addEventListener('change', function() {
         filterProductsByCategory(this.value);
         showToast(`Showing ${this.value === 'all' ? 'all products' : this.value}`, 'info', 2000);
+        resetSessionTimer();
       });
     }
 
@@ -523,6 +712,7 @@
         const id = this.dataset.id;
         const card = this.closest('.product-card');
         openModalFromCard(card, id);
+        resetSessionTimer();
       });
     });
 
@@ -536,6 +726,7 @@
         document.getElementById('deleteProductName').textContent = nameEl ? nameEl.textContent : 'Product';
         document.getElementById('confirmDeleteBtn').dataset.id = id;
         document.getElementById('deleteModal').classList.add('active');
+        resetSessionTimer();
       });
     });
 
@@ -544,6 +735,7 @@
     if (confirmDeleteBtn) {
       confirmDeleteBtn.addEventListener('click', function(e) {
         deleteProduct(this.dataset.id);
+        resetSessionTimer();
       });
     }
 
@@ -551,8 +743,72 @@
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeModal();
+        resetSessionTimer();
       }
     });
+
+    // Reset session on user activity (mouse movement, keyboard, clicks)
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    activityEvents.forEach(event => {
+      document.addEventListener(event, resetSessionOnActivity);
+    });
+
+    // Reset session on visibility change (user comes back to tab)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        resetSessionOnActivity();
+      }
+    });
+
+    // Handle beforeunload to show warning
+    window.addEventListener('beforeunload', function(e) {
+      // If session is about to expire, show warning
+      const remaining = getRemainingTime();
+      if (remaining < 60000) { // Less than 1 minute
+        e.preventDefault();
+        e.returnValue = 'Your session is about to expire. Are you sure you want to leave?';
+        return e.returnValue;
+      }
+    });
+
+    // Add session status indicator in header
+    const userEmail = document.getElementById('userEmail');
+    if (userEmail) {
+      // Add a small timer indicator
+      const sessionIndicator = document.createElement('span');
+      sessionIndicator.id = 'sessionIndicator';
+      sessionIndicator.style.cssText = `
+        font-size: 0.7rem;
+        color: #6b7280;
+        margin-left: 8px;
+        padding: 2px 8px;
+        background: #f3f4f6;
+        border-radius: 12px;
+      `;
+      userEmail.parentNode.insertBefore(sessionIndicator, userEmail.nextSibling);
+      
+      // Update session timer display
+      setInterval(() => {
+        const remaining = getRemainingTime();
+        const minutes = Math.floor(remaining / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        if (remaining > 0) {
+          sessionIndicator.textContent = `⏱️ ${minutes}m ${seconds}s`;
+          sessionIndicator.style.color = remaining < SESSION_CONFIG.WARNING_TIME ? '#dc2626' : '#6b7280';
+        } else {
+          sessionIndicator.textContent = '⏱️ Expired';
+          sessionIndicator.style.color = '#dc2626';
+        }
+      }, 10000); // Update every 10 seconds
+    }
+
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function() {
+        logoutUser('Logged out successfully.');
+      });
+    }
 
     // Add new category to datalist when user types
     const categoryInput = document.getElementById('productCategory');
@@ -570,10 +826,12 @@
             }
           }
         }
+        resetSessionTimer();
       });
     }
 
     console.log('✅ Dashboard ready!');
+    console.log(`⏱️ Session timeout: ${SESSION_CONFIG.TIMEOUT / 60000} minutes`);
   }
 
 })();
