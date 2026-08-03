@@ -1,7 +1,11 @@
 ---
+// src/pages/index.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { getCollection } from 'astro:content';
+
+// Import CSS - Only page-specific styles
+import './index.css';
 
 // Fetch all products
 const allProducts = await getCollection('products');
@@ -27,75 +31,87 @@ const featuredProducts = products.slice(0, 6);
   description="Find honest reviews, best deals, and budget-friendly product recommendations at BudgetCart. Save money on tech, fashion, home, and more!"
   categories={categories}
 >
-  <!-- Hero Section -->
-  <section id="home" class="relative bg-gradient-to-br from-blue-600 to-blue-800 text-white overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#grid)" />
-      </svg>
+  <!-- ============================================ -->
+  <!-- BACK TO TOP BUTTON                          -->
+  <!-- ============================================ -->
+  <button id="backToTop" aria-label="Back to top" title="Back to top">
+    ↑
+  </button>
+
+  <!-- ============================================ -->
+  <!-- HERO SECTION                                -->
+  <!-- ============================================ -->
+<section id="home" class="hero-section">
+  <div class="hero-background">
+    <svg class="hero-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#grid)" />
+    </svg>
+  </div>
+  <div class="hero-content">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-text">🔥 Budget Finds</span>
+      </div>
+      <h1 class="hero-title">
+        Find the Best <br/>
+        <span class="hero-highlight">Budget Products</span>
+      </h1>
+      <p class="hero-description">
+        Honest reviews, real recommendations, and exclusive deals on products you'll love.
+      </p>
+      <div class="hero-buttons">
+        <a href="#products" class="btn-primary">
+          Explore Products →
+        </a>
+        <a href="#about" class="btn-secondary">
+          Learn More
+        </a>
+      </div>
     </div>
-    <div class="max-w-7xl mx-auto px-4 py-16 md:py-20 relative">
-      <div class="max-w-3xl">
-        <div class="flex items-center gap-2 text-blue-200 text-sm font-semibold mb-4">
-          <span class="bg-white/20 px-3 py-1 rounded-full">🔥 Budget Finds</span>
+  </div>
+</section>
+
+  <!-- ============================================ -->
+  <!-- STATS SECTION                               -->
+  <!-- ============================================ -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">{totalProducts}+</div>
+          <div class="stat-label">Products Reviewed</div>
         </div>
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
-          Find the Best <br/>
-          <span class="text-yellow-300">Budget Products</span>
-        </h1>
-        <p class="text-lg md:text-xl text-blue-100 mb-6 max-w-2xl">
-          Honest reviews, real recommendations, and exclusive deals on products you'll love.
-        </p>
-        <div class="flex flex-wrap gap-3">
-          <a href="#products" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-colors shadow-lg text-sm">
-            Explore Products →
-          </a>
-          <a href="#about" class="bg-blue-700/50 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700/70 transition-colors border border-white/20 text-sm">
-            Learn More
-          </a>
+        <div class="stat-item">
+          <div class="stat-number">{avgRating}⭐</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">{categories.length}</div>
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Honest Reviews</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Stats -->
-  <section class="bg-white border-b">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-        <div>
-          <div class="text-2xl md:text-3xl font-bold text-blue-600">{totalProducts}+</div>
-          <div class="text-gray-600 text-sm">Products Reviewed</div>
-        </div>
-        <div>
-          <div class="text-2xl md:text-3xl font-bold text-blue-600">{avgRating}⭐</div>
-          <div class="text-gray-600 text-sm">Average Rating</div>
-        </div>
-        <div>
-          <div class="text-2xl md:text-3xl font-bold text-blue-600">{categories.length}</div>
-          <div class="text-gray-600 text-sm">Categories</div>
-        </div>
-        <div>
-          <div class="text-2xl md:text-3xl font-bold text-blue-600">100%</div>
-          <div class="text-gray-600 text-sm">Honest Reviews</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Products - SAME SIZE as All Products -->
-  <section id="featured" class="py-12 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-8">
-        <h2 class="text-2xl md:text-3xl font-bold mb-2">
-          🔥 Featured <span class="text-blue-600">Budget Finds</span>
+  <!-- ============================================ -->
+  <!-- FEATURED PRODUCTS SECTION                    -->
+  <!-- ============================================ -->
+  <section id="featured" class="featured-section">
+    <div class="featured-container">
+      <div class="featured-header">
+        <h2 class="featured-title">
+          🔥 Featured <span class="featured-highlight">Budget Finds</span>
         </h2>
-        <p class="text-gray-600 text-sm max-w-2xl mx-auto">
+        <p class="featured-description">
           Our top picks for the best value products in every category
         </p>
       </div>
 
-      <!-- SAME GRID as All Products - 4 columns on large screens -->
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+      <div class="featured-grid" id="featuredGrid">
         {featuredProducts.map((product) => (
           <ProductCard
             key={product.slug}
@@ -116,10 +132,10 @@ const featuredProducts = products.slice(0, 6);
         ))}
       </div>
 
-      <div class="text-center mt-8">
-        <a href="#products" class="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors font-semibold shadow-lg hover:shadow-blue-600/25 text-sm">
+      <div class="featured-footer">
+        <a href="#products" class="view-all-btn">
           View All Products
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
           </svg>
         </a>
@@ -127,20 +143,22 @@ const featuredProducts = products.slice(0, 6);
     </div>
   </section>
 
-  <!-- All Products -->
-  <section id="products" class="py-12 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-8">
-        <h2 class="text-2xl md:text-3xl font-bold mb-2">
-          🛍️ All <span class="text-blue-600">Products</span>
+  <!-- ============================================ -->
+  <!-- ALL PRODUCTS SECTION                         -->
+  <!-- ============================================ -->
+  <section id="products" class="products-section">
+    <div class="products-container">
+      <div class="products-header">
+        <h2 class="products-title">
+          🛍️ All <span class="products-highlight">Products</span>
         </h2>
-        <p class="text-gray-600 text-sm max-w-2xl mx-auto">
+        <p class="products-description">
           Browse our complete collection of budget-friendly products
         </p>
       </div>
 
       {products.length > 0 ? (
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        <div class="products-grid" id="productsGrid">
           {products.map((product) => (
             <ProductCard
               key={product.slug}
@@ -161,109 +179,104 @@ const featuredProducts = products.slice(0, 6);
           ))}
         </div>
       ) : (
-        <div class="text-center py-12">
-          <div class="text-6xl mb-4">📭</div>
-          <h2 class="text-2xl font-bold text-gray-700 mb-2">No Products Available</h2>
-          <p class="text-gray-500">Check back later for new products!</p>
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h2 class="empty-title">No Products Available</h2>
+          <p class="empty-description">Check back later for new products!</p>
         </div>
       )}
     </div>
   </section>
 
-  <!-- Why BudgetCart - Feature Cards SAME SIZE as Product Cards -->
-  <section id="about" class="py-16 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
-          About <span class="text-blue-600">BudgetCart</span>
+  <!-- ============================================ -->
+  <!-- ABOUT SECTION                               -->
+  <!-- ============================================ -->
+  <section id="about" class="about-section">
+    <div class="about-container">
+      <div class="about-header">
+        <h2 class="about-title">
+          About <span class="about-highlight">BudgetCart</span>
         </h2>
-        <div class="w-20 h-1 bg-blue-600 mx-auto rounded-full"></div>
+        <div class="about-divider"></div>
       </div>
 
-      <!-- Feature Cards - Same Grid and Size as Product Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto mb-12">
-        <div>
-          <div class="text-6xl mb-6">🛒</div>
-          <h3 class="text-2xl font-bold text-gray-800 mb-4">Your Trusted Budget Shopping Companion</h3>
-          <p class="text-gray-600 leading-relaxed mb-4">
-            BudgetCart was founded with a simple mission: <strong>help people find the best products at the best prices</strong>. We believe that quality products shouldn't break the bank, and everyone deserves access to honest, unbiased reviews.
-          </p>
-          <p class="text-gray-600 leading-relaxed mb-4">
-            Unlike other review sites that accept sponsorships, we <strong>buy and test every product ourselves</strong>. Our team of experts spends countless hours researching, comparing, and reviewing products so you don't have to.
-          </p>
-          <div class="flex flex-wrap gap-4 mt-6">
-            <div class="flex items-center gap-2">
-              <span class="text-green-500">✓</span>
-              <span class="text-sm text-gray-700">100% Honest Reviews</span>
+      <div class="about-content">
+        <!-- Main Content -->
+        <div class="about-main">
+          <div class="about-text">
+            <div class="about-icon">🛒</div>
+            <h3 class="about-subtitle">Your Trusted Budget Shopping Companion</h3>
+            <p class="about-paragraph">
+              BudgetCart was founded with a simple mission: <strong>help people find the best products at the best prices</strong>. We believe that quality products shouldn't break the bank, and everyone deserves access to honest, unbiased reviews.
+            </p>
+            <p class="about-paragraph">
+              Unlike other review sites that accept sponsorships, we <strong>buy and test every product ourselves</strong>. Our team of experts spends countless hours researching, comparing, and reviewing products so you don't have to.
+            </p>
+            <div class="about-features">
+              <div class="about-feature">
+                <span class="feature-check">✓</span>
+                <span class="feature-text">100% Honest Reviews</span>
+              </div>
+              <div class="about-feature">
+                <span class="feature-check">✓</span>
+                <span class="feature-text">Real Product Testing</span>
+              </div>
+              <div class="about-feature">
+                <span class="feature-check">✓</span>
+                <span class="feature-text">Best Price Guarantee</span>
+              </div>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-green-500">✓</span>
-              <span class="text-sm text-gray-700">Real Product Testing</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="text-green-500">✓</span>
-              <span class="text-sm text-gray-700">Best Price Guarantee</span>
+          </div>
+
+          <div class="about-stats-card">
+            <h4 class="stats-card-title">📊 Quick Facts</h4>
+            <div class="stats-list">
+              <div class="stats-item">
+                <span class="stats-label">Products Reviewed</span>
+                <span class="stats-value">{totalProducts}+</span>
+              </div>
+              <div class="stats-item">
+                <span class="stats-label">Categories</span>
+                <span class="stats-value">{categories.length}</span>
+              </div>
+              <div class="stats-item">
+                <span class="stats-label">Average Rating</span>
+                <span class="stats-value">{avgRating} ⭐</span>
+              </div>
+              <div class="stats-item">
+                <span class="stats-label">Founded</span>
+                <span class="stats-value">2024</span>
+              </div>
+              <div class="stats-item">
+                <span class="stats-label">Review Accuracy</span>
+                <span class="stats-value highlight">100% Honest</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl p-8 shadow-lg">
-          <h4 class="font-bold text-lg text-gray-800 mb-4">📊 Quick Facts</h4>
-          <div class="space-y-4">
-            <div class="flex justify-between items-center border-b pb-3">
-              <span class="text-gray-600">Products Reviewed</span>
-              <span class="font-bold text-blue-600">{totalProducts}+</span>
-            </div>
-            <div class="flex justify-between items-center border-b pb-3">
-              <span class="text-gray-600">Categories</span>
-              <span class="font-bold text-blue-600">{categories.length}</span>
-            </div>
-            <div class="flex justify-between items-center border-b pb-3">
-              <span class="text-gray-600">Average Rating</span>
-              <span class="font-bold text-blue-600">{avgRating} ⭐</span>
-            </div>
-            <div class="flex justify-between items-center border-b pb-3">
-              <span class="text-gray-600">Founded</span>
-              <span class="font-bold text-blue-600">2024</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">Review Accuracy</span>
-              <span class="font-bold text-green-600">100% Honest</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature Cards - SAME SIZE as Product Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
-        <!-- Feature Card 1 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
-          <div class="p-6 flex flex-col items-center text-center flex-grow">
-            <div class="text-5xl mb-4">🔍</div>
-            <h4 class="font-bold text-gray-800 mb-2 text-base">Transparency</h4>
-            <p class="text-sm text-gray-600 leading-relaxed">
+        <!-- Feature Cards -->
+        <div class="feature-cards">
+          <div class="feature-card">
+            <div class="feature-card-icon">🔍</div>
+            <h4 class="feature-card-title">Transparency</h4>
+            <p class="feature-card-text">
               We disclose everything - no hidden agendas, no sponsored reviews. Just honest opinions.
             </p>
           </div>
-        </div>
 
-        <!-- Feature Card 2 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
-          <div class="p-6 flex flex-col items-center text-center flex-grow">
-            <div class="text-5xl mb-4">💰</div>
-            <h4 class="font-bold text-gray-800 mb-2 text-base">Value for Money</h4>
-            <p class="text-sm text-gray-600 leading-relaxed">
+          <div class="feature-card">
+            <div class="feature-card-icon">💰</div>
+            <h4 class="feature-card-title">Value for Money</h4>
+            <p class="feature-card-text">
               We focus on products that offer the best quality for the price, helping you save money.
             </p>
           </div>
-        </div>
 
-        <!-- Feature Card 3 -->
-        <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
-          <div class="p-6 flex flex-col items-center text-center flex-grow">
-            <div class="text-5xl mb-4">🛡️</div>
-            <h4 class="font-bold text-gray-800 mb-2 text-base">Trust</h4>
-            <p class="text-sm text-gray-600 leading-relaxed">
+          <div class="feature-card">
+            <div class="feature-card-icon">🛡️</div>
+            <h4 class="feature-card-title">Trust</h4>
+            <p class="feature-card-text">
               Our community trusts us because we consistently deliver reliable, accurate reviews.
             </p>
           </div>
@@ -272,25 +285,33 @@ const featuredProducts = products.slice(0, 6);
     </div>
   </section>
 
-  <!-- Newsletter -->
-  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12">
-    <div class="max-w-3xl mx-auto px-4 text-center">
-      <h2 class="text-2xl md:text-3xl font-bold mb-3">📬 Get Budget Deals in Your Inbox</h2>
-      <p class="text-blue-100 mb-6 text-sm">
+  <!-- ============================================ -->
+  <!-- NEWSLETTER SECTION                          -->
+  <!-- ============================================ -->
+  <section class="newsletter-section">
+    <div class="newsletter-container">
+      <h2 class="newsletter-title">📬 Get Budget Deals in Your Inbox</h2>
+      <p class="newsletter-description">
         Subscribe to get the best budget finds and exclusive deals delivered weekly.
       </p>
-      <form class="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+      <form class="newsletter-form" id="newsletterForm">
         <input 
           type="email" 
           placeholder="Enter your email" 
-          class="flex-1 px-4 py-2.5 rounded-xl text-gray-800 focus:outline-none focus:ring-4 focus:ring-blue-300 text-sm"
+          class="newsletter-input"
+          id="newsletterEmail"
           required
         />
-        <button type="submit" class="bg-white text-blue-600 px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-50 transition-colors text-sm">
+        <button type="submit" class="newsletter-button" id="newsletterSubmit">
           Subscribe Free →
         </button>
       </form>
-      <p class="text-blue-200 text-xs mt-3">No spam. Unsubscribe anytime.</p>
+      <p class="newsletter-note">No spam. Unsubscribe anytime.</p>
     </div>
   </section>
+
+  <!-- ============================================ -->
+  <!-- JAVASCRIPT - External File                  -->
+  <!-- ============================================ -->
+  <script is:inline src="/index.js"></script>
 </BaseLayout>

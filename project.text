@@ -1,47 +1,52 @@
 budgetcart/
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml              # Render auto-deploy workflow
+│       └── deploy.yml
+├── public/
+│   ├── admin/
+│   │       └── dashboard.js
+│   ├── images/
+│   │   └── products/
+│   │       └── placeholder.jpg
+│   ├── favicon.ico
+│   └── logo.svg
 ├── src/
 │   ├── content/
-│   │   ├── config.ts               # Keystatic content config
+│   │   ├── config.ts
 │   │   └── products/
-│   │       └── sample-product.md   # Product reviews
+│   │       └── sample-product.md
 │   ├── layouts/
-│   │   ├── BaseLayout.astro        # Global layout
-│   │   └── ProductLayout.astro     # Product page layout
+│   │   ├── BaseLayout.astro
+│   │   └── ProductLayout.astro
 │   ├── components/
-│   │   ├── ProductCard.astro       # Product card component
-│   │   ├── AffiliateButton.astro   # Affiliate link button
-│   │   ├── Header.astro            # Site header
-│   │   └── Footer.astro            # Site footer
+│   │   ├── ProductCard.astro
+│   │   ├── AffiliateButton.astro
+│   │   ├── Header.astro
+│   │   └── Footer.astro
+│   ├── lib/
+│   │   └── github-api.js
 │   ├── pages/
-│   │   ├── index.astro             # Homepage
+│   │   ├── index.astro                    # Homepage
+│   │   ├── admin/
+│   │   │   ├── login.astro                    # Admin login page
+│   │   │   ├── _dashboard.css                    
+│   │   │   └── dashboard.astro            # Admin dashboard
 │   │   ├── products/
-│   │   │   └── [slug].astro        # Dynamic product page
-│   │   ├── categories/
-│   │   │   └── [category].astro    # Category page
-│   │   └── api/
-│   │       └── keystatic/
-│   │           └── [...path].astro # Keystatic API routes
+│   │   │   └── [slug].astro               # Dynamic product pages
+│   │   └── categories/
+│   │       └── [category].astro           # Category pages
 │   ├── styles/
-│   │   └── global.css              # Global styles
+│   │   └── global.css
 │   └── utils/
-│       └── affiliate.js            # Affiliate link helpers
-├── public/
-│   ├── images/
-│   │   └── products/               # Product images
-│   └── favicon.ico
-├── keystatic/
-│   └── config.ts                   # Keystatic configuration
-├── astro.config.mjs                # Astro configuration
-├── package.json                    # Dependencies
-├── tsconfig.json                   # TypeScript config
-├── tailwind.config.cjs             # Tailwind configuration
-├── .env.example                    # Environment variables
-├── .gitignore                      # Git ignore file
-└── README.md                       # Project documentation
-
+│       └── affiliate.js
+├── astro.config.mjs
+├── package.json
+├── tailwind.config.cjs
+├── wrangler.toml                          # Cloudflare Worker config
+├── worker.js                              # Cloudflare Worker (OAuth proxy)
+├── .env                                   # Local environment variables
+├── .gitignore
+└── README.md
 
 IMP Commands
 npx wrangler dev --port 8787 --env local
