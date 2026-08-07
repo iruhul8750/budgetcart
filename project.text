@@ -63,3 +63,4 @@ npx wrangler deploy --env production
 
 Local callback url 
 http://127.0.0.1:8787/auth/callback
+
