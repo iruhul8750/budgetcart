@@ -35,6 +35,7 @@ Thumbs.db
 .aider*
 .wrangler/state/v3/cache/miniflare-CacheObject
 .wrangler
+wrangler-local.toml
 
 # Playwright
 /test-results/
