@@ -1,15 +1,13 @@
-# wrangler.toml - Safe to commit to Git
+# wrangler.toml
 name = "budgetcart"
 main = "worker.js"
 compatibility_date = "2024-12-18"
 pages_build_output_dir = "dist"
 
-# Only put NON-sensitive defaults here
+# ONLY ONE [vars] section - include all variables here
 [vars]
 NODE_ENV = "production"
 PUBLIC_SITE_URL = "https://budgetcart.pages.dev"
 DEBUG = "false"
-
-# These are just placeholders - they don't contain real secrets
-[vars]
-API_KEY = "your-api-key-here"  # ← NOT real, just a placeholder
+API_KEY = ""  # Placeholder - set real value in dashboard
+SECRET_TOKEN = ""  # Placeholder - set real value in dashboard
